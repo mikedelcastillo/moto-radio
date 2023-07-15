@@ -51,7 +51,7 @@ const run = async () => {
     lines.push("")
     lines.push(...[
         "float parseFloatFromChar(char value){",
-        `  return ((float) parseIntFromChar(value)) / ((float) ${CONSTS.INT_START_BYTE});`,
+        `  return ((float) parseIntFromChar(value)) / ((float) ${CONSTS.INT_MAX_VALUE});`,
         "}",
     ])
 
