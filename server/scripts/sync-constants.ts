@@ -11,6 +11,7 @@ const lines = [
 
 const run = async () => {
   const defineValues: Array<[string, string]> = [
+    ["SERIAL_BAUDRATE", CONSTS.SERIAL_BAUDRATE.toString()],
     ["MAX_CONTROLLERS", CONSTS.MAX_CONTROLLERS.toString()],
     ["MAX_RADIO_ADDRESSES", CONSTS.MAX_RADIO_ADDRESSES.toString()],
   ]
@@ -52,7 +53,7 @@ const run = async () => {
   lines.push(...[
     `${CONSTS.CONTROLLER_INPUT_ENUM_VAR} get${CONSTS.CONTROLLER_INPUT_ENUM_VAR}(char value){`,
     ...CONSTS.CONTROLLER_INPUT_ENUM.map(type =>
-      `  if(value == ${CONSTS.BYTES[type as CONSTS.ByteKeys].charCodeAt(0)}) { return ${CONSTS.CONTROLLER_INPUT_ENUM_PREFIX}${type}; }`),
+      `  if(value == ${CONSTS.BYTES[type].charCodeAt(0)}) { return ${CONSTS.CONTROLLER_INPUT_ENUM_PREFIX}${type}; }`),
     "}",
   ])
 
@@ -78,7 +79,7 @@ const run = async () => {
     `void setControllerInputValue(ControllerInput *cinput, byte input, byte value){`,
     `  uint8_t intValue = parseIntFromChar(value);`,
     ...CONSTS.CONTROLLER_INPUT_ENUM.map(type =>
-      `  if(input == ${CONSTS.BYTES[type as CONSTS.ByteKeys].charCodeAt(0)}) { cinput->${type} = intValue; }`),
+      `  if(input == ${CONSTS.BYTES[type].charCodeAt(0)}) { cinput->${type} = intValue; }`),
     `}`,
   ])
 

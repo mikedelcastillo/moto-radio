@@ -1,3 +1,4 @@
+export const SERIAL_BAUDRATE = 115200
 export const MAX_CONTROLLERS = 4
 export const INT_MAX_VALUE = 128
 export const INT_START_BYTE = "0".charCodeAt(0)
@@ -43,12 +44,13 @@ export const CONTROLLER_INPUT_ENUM = [
 
 export const BYTE_KEYS = [...MESSAGE_BYTE_KEYS, ...CONTROLLER_INPUT_ENUM] as const
 
-export type ByteKeys = keyof typeof BYTE_KEYS
+export type ControllerInput = typeof CONTROLLER_INPUT_ENUM[number]
+export type ByteKeys = typeof BYTE_KEYS[number]
 
 export const BYTES = {
   CONTROLLER_INPUT: "i",
   CONTROLLER_ADDRESS: "a",
-} as unknown as Record<ByteKeys, string>
+} as Record<ByteKeys, string>
 
 for (let i = 0; i < CONTROLLER_INPUT_ENUM.length; i++) {
   const key = CONTROLLER_INPUT_ENUM[i] as unknown as ByteKeys

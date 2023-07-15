@@ -15,7 +15,7 @@ LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(SERIAL_BAUDRATE);
 
   setupRadio(&radio);
 

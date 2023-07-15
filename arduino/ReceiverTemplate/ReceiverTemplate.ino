@@ -8,7 +8,7 @@ void setup()
 {
   setupRadioReceiver(&radio, RADIO_ADDRESS);
 
-  Serial.begin(115200);
+  Serial.begin(SERIAL_BAUDRATE);
   Serial.println("Listening...");
 }
 
