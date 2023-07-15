@@ -1,0 +1,28 @@
+{
+  "name": "@moto-radio/server",
+  "version": "0.0.1",
+  "main": "build/index.js",
+  "author": "Mike del Castillo",
+  "license": "MIT",
+  "scripts": {
+    "start": "node ./build/index.js",
+    "start-ts": "ts-node ./src",
+    "build": "npx tsc",
+    "dev": "nodemon",
+    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0 --fix",
+    "sync-constants": "ts-node ./scripts/sync-constants.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^18.16.19",
+    "@types/ws": "^8.5.4",
+    "@typescript-eslint/eslint-plugin": "^5.59.0",
+    "@typescript-eslint/parser": "^5.59.0",
+    "eslint": "^8.39.0",
+    "nodemon": "^2.0.22",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "serialport": "^10.5.0"
+  }
+}
