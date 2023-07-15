@@ -6,7 +6,7 @@ ControllerInput CONTROLLER_INPUT;
 
 void setup()
 {
-  setupRadioReceiver(radio, RADIO_ADDRESS);
+  setupRadioReceiver(&radio, RADIO_ADDRESS);
 
   Serial.begin(115200);
   Serial.println("Listening...");
@@ -14,7 +14,7 @@ void setup()
 
 void loop()
 {
-  updateRadioInput(radio, CONTROLLER_INPUT);
+  updateRadioInput(&radio, &CONTROLLER_INPUT);
   if (CONTROLLER_INPUT.BUTTON_A > 0)
   {
     Serial.println("ButA");

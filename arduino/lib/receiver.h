@@ -1,19 +1,19 @@
 #include "constants.h"
 #include "radio.h"
 
-void setupRadioReceiver(RF24 &radio, byte *address)
+void setupRadioReceiver(RF24 *radio, byte *address)
 {
   setupRadio(radio);
-  radio.openReadingPipe(1, address);
-  radio.startListening();
+  radio->openReadingPipe(1, address);
+  radio->startListening();
 }
 
-void updateRadioInput(RF24 &radio, ControllerInput &cinput)
+void updateRadioInput(RF24 *radio, ControllerInput *cinput)
 {
-  if (radio.available())
+  if (radio->available())
   {
     RadioData data;
-    radio.read(&data, sizeof(RadioData));
+    radio->read(&data, sizeof(RadioData));
     setControllerInputValue(cinput, data.input, data.value);
   }
 }

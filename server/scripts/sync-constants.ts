@@ -44,17 +44,17 @@ const run = async () => {
   ])
 
   // Controller enum
-  // lines.push("")
-  // lines.push(`enum ${CONSTS.CONTROLLER_INPUT_ENUM_VAR} {\n${CONSTS.CONTROLLER_INPUT_ENUM.map(type => `  ${CONSTS.CONTROLLER_INPUT_ENUM_PREFIX}${type}`).join(",\n")},\n};`)
+  lines.push("")
+  lines.push(`enum ${CONSTS.CONTROLLER_INPUT_ENUM_VAR} {\n${CONSTS.CONTROLLER_INPUT_ENUM.map(type => `  ${CONSTS.CONTROLLER_INPUT_ENUM_PREFIX}${type}`).join(",\n")},\n};`)
 
   // Controller type helper
-  // lines.push("")
-  // lines.push(...[
-  //   `${CONSTS.CONTROLLER_INPUT_ENUM_VAR} get${CONSTS.CONTROLLER_INPUT_ENUM_VAR}(char value){`,
-  //   ...CONSTS.CONTROLLER_INPUT_ENUM.map(type =>
-  //     `  if(value == ${CONSTS.BYTES[type as CONSTS.ByteKeys].charCodeAt(0)}) { return ${CONSTS.CONTROLLER_INPUT_ENUM_PREFIX}${type}; }`),
-  //   "}",
-  // ])
+  lines.push("")
+  lines.push(...[
+    `${CONSTS.CONTROLLER_INPUT_ENUM_VAR} get${CONSTS.CONTROLLER_INPUT_ENUM_VAR}(char value){`,
+    ...CONSTS.CONTROLLER_INPUT_ENUM.map(type =>
+      `  if(value == ${CONSTS.BYTES[type as CONSTS.ByteKeys].charCodeAt(0)}) { return ${CONSTS.CONTROLLER_INPUT_ENUM_PREFIX}${type}; }`),
+    "}",
+  ])
 
   // Controller input struct
   lines.push("")
@@ -67,19 +67,18 @@ const run = async () => {
   // Controller struct reset
   lines.push("")
   lines.push(...[
-    `void resetControllerInput(ControllerInput &cinput){`,
-    ...CONSTS.CONTROLLER_INPUT_ENUM.map(type => `  cinput.${type} = 0;`),
+    `void resetControllerInput(ControllerInput *cinput){`,
+    ...CONSTS.CONTROLLER_INPUT_ENUM.map(type => `  cinput->${type} = 0;`),
     `}`,
   ])
 
   // Controller struct set via char
   lines.push("")
   lines.push(...[
-    `void setControllerInputValue(ControllerInput &cinput, byte input, byte value){`,
+    `void setControllerInputValue(ControllerInput *cinput, byte input, byte value){`,
     `  uint8_t intValue = parseIntFromChar(value);`,
-
     ...CONSTS.CONTROLLER_INPUT_ENUM.map(type =>
-      `  if(value == ${CONSTS.BYTES[type as CONSTS.ByteKeys].charCodeAt(0)}) { cinput.${type} = intValue; }`),
+      `  if(input == ${CONSTS.BYTES[type as CONSTS.ByteKeys].charCodeAt(0)}) { cinput->${type} = intValue; }`),
     `}`,
   ])
 

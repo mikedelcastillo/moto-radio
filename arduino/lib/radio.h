@@ -8,12 +8,12 @@ typedef struct
   byte value;
 } RadioData;
 
-void setupRadio(RF24 &radio)
+void setupRadio(RF24 *radio)
 {
-  radio.begin();
+  radio->begin();
   delay(1000);
-  radio.setAutoAck(false);
-  radio.setDataRate(RF24_250KBPS);
-  radio.setPALevel(RF24_PA_MIN);
-  radio.setPayloadSize(sizeof(RadioData));
+  radio->setAutoAck(false);
+  radio->setDataRate(RF24_250KBPS);
+  radio->setPALevel(RF24_PA_MIN);
+  radio->setPayloadSize(sizeof(RadioData));
 }
