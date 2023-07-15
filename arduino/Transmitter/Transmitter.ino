@@ -17,7 +17,7 @@ void setup()
 {
   Serial.begin(115200);
 
-  setupRadioTransmitter(radio);
+  setupRadio(radio);
 
   lcd.begin(20, 4);
   lcd.clear();

@@ -25,19 +25,6 @@ const run = async () => {
     lines.push(`#define ${varName} ${value}`)
   }
 
-  // Controller enum
-  lines.push("")
-  lines.push(`enum ${CONSTS.CONTROLLER_INPUT_ENUM_VAR} {\n${CONSTS.CONTROLLER_INPUT_ENUM.map(type => `  ${CONSTS.CONTROLLER_INPUT_ENUM_PREFIX}${type}`).join(",\n")},\n};`)
-
-  // Controller type helper
-  lines.push("")
-  lines.push(...[
-    `${CONSTS.CONTROLLER_INPUT_ENUM_VAR} get${CONSTS.CONTROLLER_INPUT_ENUM_VAR}(char value){`,
-    ...CONSTS.CONTROLLER_INPUT_ENUM.map(type =>
-      `  if(value == ${CONSTS.BYTES[type as CONSTS.ByteKeys].charCodeAt(0)}) { return ${CONSTS.CONTROLLER_INPUT_ENUM_PREFIX}${type}; }`),
-    "}",
-  ])
-
   // Int parser
   lines.push("")
   lines.push(...[
@@ -54,6 +41,46 @@ const run = async () => {
     "float parseFloatFromChar(char value){",
     `  return ((float) parseIntFromChar(value)) / ((float) ${CONSTS.INT_MAX_VALUE});`,
     "}",
+  ])
+
+  // Controller enum
+  // lines.push("")
+  // lines.push(`enum ${CONSTS.CONTROLLER_INPUT_ENUM_VAR} {\n${CONSTS.CONTROLLER_INPUT_ENUM.map(type => `  ${CONSTS.CONTROLLER_INPUT_ENUM_PREFIX}${type}`).join(",\n")},\n};`)
+
+  // Controller type helper
+  // lines.push("")
+  // lines.push(...[
+  //   `${CONSTS.CONTROLLER_INPUT_ENUM_VAR} get${CONSTS.CONTROLLER_INPUT_ENUM_VAR}(char value){`,
+  //   ...CONSTS.CONTROLLER_INPUT_ENUM.map(type =>
+  //     `  if(value == ${CONSTS.BYTES[type as CONSTS.ByteKeys].charCodeAt(0)}) { return ${CONSTS.CONTROLLER_INPUT_ENUM_PREFIX}${type}; }`),
+  //   "}",
+  // ])
+
+  // Controller input struct
+  lines.push("")
+  lines.push(...[
+    `typedef struct {`,
+    ...CONSTS.CONTROLLER_INPUT_ENUM.map(type => `  uint8_t ${type};`),
+    `} ControllerInput;`,
+  ])
+
+  // Controller struct reset
+  lines.push("")
+  lines.push(...[
+    `void resetControllerInput(ControllerInput &cinput){`,
+    ...CONSTS.CONTROLLER_INPUT_ENUM.map(type => `  cinput.${type} = 0;`),
+    `}`,
+  ])
+
+  // Controller struct set via char
+  lines.push("")
+  lines.push(...[
+    `void setControllerInputValue(ControllerInput &cinput, byte input, byte value){`,
+    `  uint8_t intValue = parseIntFromChar(value);`,
+
+    ...CONSTS.CONTROLLER_INPUT_ENUM.map(type =>
+      `  if(value == ${CONSTS.BYTES[type as CONSTS.ByteKeys].charCodeAt(0)}) { cinput.${type} = intValue; }`),
+    `}`,
   ])
 
   // Radio addresses

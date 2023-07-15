@@ -17,15 +17,3 @@ void setupRadio(RF24 &radio)
   radio.setPALevel(RF24_PA_MIN);
   radio.setPayloadSize(sizeof(RadioData));
 }
-
-void setupRadioReceiver(RF24 &radio, byte *address)
-{
-  setupRadio(radio);
-  radio.openReadingPipe(1, address);
-  radio.startListening();
-}
-
-void setupRadioTransmitter(RF24 &radio)
-{
-  setupRadio(radio);
-}
