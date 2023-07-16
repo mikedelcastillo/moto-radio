@@ -32,6 +32,8 @@ export const CONTROLLER_INPUT_ENUM = [
   "BUTTON_DD",
   "BUTTON_DL",
   "BUTTON_DR",
+  "BUTTON_LS",
+  "BUTTON_RS",
   "AXIS_LXL",
   "AXIS_LXR",
   "AXIS_LYU",
@@ -40,6 +42,8 @@ export const CONTROLLER_INPUT_ENUM = [
   "AXIS_RXR",
   "AXIS_RYU",
   "AXIS_RYD",
+  "BUTTON_CENTER",
+  "IGNORE",
 ] as const
 
 export const BYTE_KEYS = [...MESSAGE_BYTE_KEYS, ...CONTROLLER_INPUT_ENUM] as const
