@@ -21,8 +21,13 @@ import { LinuxJoystick } from "./lib/joystick";
 
 const run = async () => {
   const js0 = new LinuxJoystick(0)
+  js0.on("error", (err) => {
+    console.warn(err)
+    process.exit()
+  })
   js0.on("input", console.log)
-  js0.init()
+  await js0.open()
+  console.log(js0)
 }
 
 run()

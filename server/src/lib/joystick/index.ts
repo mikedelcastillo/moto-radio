@@ -22,21 +22,17 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
     this.id = id
   }
 
-  async init() {
-    return new Promise<void>((resolve) => {
-      open(`/dev/input/js${this.id}`, "r", () => {
-        this.open.bind(this)
+  open() {
+    return new Promise<void>((resolve, reject) => {
+      open(`/dev/input/js${this.id}`, "r", (err, fd) => {
+        if (err) {
+          this.trigger("error", err)
+          return reject()
+        }
+        this.fd = fd
         resolve()
       })
     })
-  }
-
-  private open(err: NodeJS.ErrnoException | null, fd: number) {
-    if (err) {
-      this.trigger("error", err)
-      throw err
-    }
-    this.fd = fd
   }
 
   private read() {
@@ -57,7 +53,7 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
     if (this.fd) this.read()
   }
 
-  async close() {
+  close() {
     return new Promise<void>((resolve, reject) => {
       if (typeof this.fd === "undefined") return reject()
       close(this.fd, () => {
