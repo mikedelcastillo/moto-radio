@@ -26,7 +26,7 @@ const run = async () => {
     process.exit()
   })
   js0.on("input", (input) => {
-    console.log(input)
+    console.log(JSON.stringify(js0.values))
   })
   await js0.open()
 }

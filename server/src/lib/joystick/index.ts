@@ -1,6 +1,7 @@
 import { exec } from "child_process";
 import { close, open, read } from "fs";
 import { EventBus } from "../../bus";
+import { ControllerInput, CONTROLLER_INPUT_ENUM } from "../../constants";
 import { JoystickInput, JoystickMappedInput, JoystickMapping, JOYSTICK_MAPPINGS } from "./map";
 
 type JoystickEventMap = {
@@ -17,22 +18,27 @@ type JoystickValues = {
 export class LinuxJoystick extends EventBus<JoystickEventMap>{
   map = JoystickMapping.MICROSOFT_XBOX_ONE
   private path = ""
-  values: JoystickValues = {
+  rawValues: JoystickValues = {
     buttons: {},
     axes: {},
   }
+  values = {} as Record<ControllerInput, number>
   private buffer: Buffer = Buffer.alloc(8)
   private fd?: number
 
   constructor(id: number) {
     super()
     this.path = `/dev/input/js${id}`
+    this.resetValues()
   }
 
   resetValues() {
-    this.values = {
+    this.rawValues = {
       buttons: {},
       axes: {},
+    }
+    for (const key of CONTROLLER_INPUT_ENUM) {
+      this.values[key] = 0
     }
   }
 
@@ -82,10 +88,11 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
       value: this.buffer.readInt16LE(4),
       init: !!(this.buffer[6] & 0x80)
     }
-    this.values[payload.type === "button" ? "buttons" : "axes"][payload.number] = payload.value
+    this.rawValues[payload.type === "button" ? "buttons" : "axes"][payload.number] = payload.value
     this.trigger("rawInput", payload)
     const mappedInputs = JOYSTICK_MAPPINGS[this.map](payload)
     for (const mappedInput of mappedInputs) {
+      this.values[mappedInput.type] = mappedInput.value
       this.trigger("input", mappedInput)
     }
     if (this.fd) this.read()
