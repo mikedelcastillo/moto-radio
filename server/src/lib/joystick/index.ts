@@ -4,7 +4,7 @@ import { EventBus } from "../../bus";
 import { ControllerInput, CONTROLLER_INPUT_ENUM } from "../../constants";
 import { JoystickInput, JoystickMappedInput, JoystickMapping, JOYSTICK_MAPPINGS } from "./map";
 
-type JoystickEventMap = {
+export type JoystickEventMap = {
   error: NodeJS.ErrnoException,
   rawInput: JoystickInput,
   input: JoystickMappedInput,
@@ -21,6 +21,7 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
   private buffer: Buffer = Buffer.alloc(8)
   private fd?: number
 
+  name = ""
   map = JoystickMapping.MICROSOFT_XBOX_ONE
   rawValues: JoystickValues = {
     buttons: {},
@@ -51,17 +52,19 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
   }
 
   async open() {
-    await this.setMapping()
+    await this.getDevice()
     await this.startReading()
   }
 
-  setMapping() {
+  getDevice() {
     return new Promise<void>((resolve, reject) => {
       exec(`udevadm info -a ${this.path} | grep ATTRS{name}`, (err, stdout) => {
-        if (err) return reject()
-        if (stdout.match(/xbox/i))
+        if (err) return reject(err)
+        const deviceName = (/"(.*?)"/).exec(stdout)?.[1] || ""
+        this.name = deviceName
+        if (deviceName.match(/xbox/i))
           this.map = JoystickMapping.MICROSOFT_XBOX_ONE
-        if (stdout.match(/8bitdo ultimate/i))
+        if (deviceName.match(/8bitdo ultimate/i))
           this.map = JoystickMapping._8BITDO_ULTIMATE
         resolve()
       })
@@ -73,7 +76,7 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
       open(this.path, "r", (err, fd) => {
         if (err) {
           this.trigger("error", err)
-          return reject()
+          return reject(err)
         }
         this.fd = fd
         this.read()
@@ -113,8 +116,8 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
   }
 
   close() {
-    return new Promise<void>((resolve, reject) => {
-      if (typeof this.fd === "undefined") return reject()
+    return new Promise<void>((resolve) => {
+      if (typeof this.fd === "undefined") return
       close(this.fd, () => {
         this.fd = undefined
         this.resetValues()

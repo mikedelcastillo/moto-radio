@@ -84,12 +84,6 @@ export const JOYSTICK_MAPPINGS: Record<JoystickMapping, JoystickMap> = {
     return []
   },
   [JoystickMapping._8BITDO_ULTIMATE]: (input) => {
-
-    // button map
-    if (input.type === "button") {
-      return {} as JoystickMappedInput[]
-    }
-    // axis map
-    return {} as JoystickMappedInput[]
+    return []
   },
 }

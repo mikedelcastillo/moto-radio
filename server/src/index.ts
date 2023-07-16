@@ -2,6 +2,9 @@
 // import { SerialPort, ReadlineParser } from "serialport"
 // import { SERIAL_BAUDRATE } from "./constants"
 
+import { MAX_CONTROLLERS } from "./constants";
+import { JoystickManager } from "./lib/joystick/manager";
+
 // const board = new SerialPort({
 //   path: "/dev/ttyUSB0",
 //   baudRate: SERIAL_BAUDRATE,
@@ -17,24 +20,22 @@
 //   console.log("Connected to board!")
 // })
 
-import { LinuxJoystick } from "./lib/joystick";
+const joystickManagers: JoystickManager[] = []
 
-const run = async () => {
-  const js0 = new LinuxJoystick(0)
-  js0.on("error", (err) => {
-    console.warn(err)
-    process.exit()
-  })
-  // js0.on("input", (input) => {
-  //   console.log(JSON.stringify(js0.values))
-  // })
-  js0.on("change", () => {
-    console.log(js0.trackedChanges)
-  })
-  setInterval(() => {
-    js0.clearTrackedChanges()
-  }, 1000)
-  await js0.open()
+for (let i = 0; i < MAX_CONTROLLERS; i++) {
+  joystickManagers.push(new JoystickManager(i))
 }
 
-run()
+function updateLoop() {
+  for (const jm of joystickManagers) {
+    jm.js?.clearTrackedChanges()
+    const changes = jm.js?.trackedChanges || []
+    if (changes.length) {
+      console.log(changes)
+    }
+  }
+}
+
+setTimeout(() => {
+  updateLoop()
+}, 1000 / 20)
