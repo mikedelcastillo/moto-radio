@@ -36,6 +36,11 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
     this.resetValues()
   }
 
+  log(message: string) {
+    if (typeof process.env.DEBUG_JOYSTICK === "string")
+      console.log(`[JS@${this.path}]: ${message}`)
+  }
+
   resetValues() {
     this.rawValues = {
       buttons: {},
@@ -54,6 +59,7 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
   async open() {
     await this.getDevice()
     await this.startReading()
+    this.log("Ready")
   }
 
   getDevice() {
@@ -66,6 +72,7 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
           this.map = JoystickMapping.MICROSOFT_XBOX_ONE
         if (deviceName.match(/8bitdo ultimate/i))
           this.map = JoystickMapping._8BITDO_ULTIMATE
+        if (deviceName) this.log(`Device name: ${deviceName}`)
         resolve()
       })
     })
@@ -101,6 +108,7 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
     }
     this.rawValues[payload.type === "button" ? "buttons" : "axes"][payload.number] = payload.value
     this.trigger("rawInput", payload)
+    this.log(`Raw: ${payload.time} ${payload.type} ${payload.number} ${payload.value}`)
     const mappedInputs = JOYSTICK_MAPPINGS[this.map](payload)
     for (const mappedInput of mappedInputs) {
       if (this.values[mappedInput.type] !== mappedInput.value) {
@@ -111,6 +119,7 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
         }
       }
       this.trigger("input", mappedInput)
+      this.log(`Mapped: ${mappedInput.type} ${mappedInput.value}`)
     }
     if (this.fd) this.read()
   }
