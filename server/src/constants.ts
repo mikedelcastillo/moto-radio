@@ -1,7 +1,7 @@
 export const SERIAL_BAUDRATE = 115200
 export const MAX_CONTROLLERS = 4
 export const INT_MAX_VALUE = 128
-export const INT_START_BYTE = "0".charCodeAt(0)
+export const INT_START_BYTE = 0
 
 export const RADIO_ADDRESSES = [
   "twig", "soy", "boni", "branch", "pizza", "drafj",
@@ -12,7 +12,6 @@ export const MAX_RADIO_ADDRESSES = RADIO_ADDRESSES.length
 
 export const MESSAGE_BYTE_KEYS = [
   "CONTROLLER_INPUT",
-  "CONTROLLER_ADDRESS",
 ] as const
 
 export const CONTROLLER_INPUT_ENUM_VAR = "ControllerInputType"
@@ -53,7 +52,6 @@ export type ByteKeys = typeof BYTE_KEYS[number]
 
 export const BYTES = {
   CONTROLLER_INPUT: "i",
-  CONTROLLER_ADDRESS: "a",
 } as Record<ByteKeys, string>
 
 for (let i = 0; i < CONTROLLER_INPUT_ENUM.length; i++) {

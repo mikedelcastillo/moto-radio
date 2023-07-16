@@ -2,24 +2,16 @@
 // import { SerialPort, ReadlineParser } from "serialport"
 // import { SERIAL_BAUDRATE } from "./constants"
 
-import { MAX_CONTROLLERS } from "./constants";
+import { SerialPort } from "serialport";
+import { MAX_CONTROLLERS, SERIAL_BAUDRATE } from "./constants";
 import { JoystickManager } from "./lib/joystick/manager";
 import { createInputMessage } from "./lib/message";
 
-// const board = new SerialPort({
-//   path: "/dev/ttyUSB0",
-//   baudRate: SERIAL_BAUDRATE,
-//   autoOpen: false,
-// })
-
-// board.open((error) => {
-//   if (error) {
-//     console.log("Could not connect to board")
-//     process.exit()
-//   }
-
-//   console.log("Connected to board!")
-// })
+const board = new SerialPort({
+  path: "/dev/ttyUSB0",
+  baudRate: SERIAL_BAUDRATE,
+  autoOpen: false,
+})
 
 const joystickManagers: JoystickManager[] = []
 
@@ -43,11 +35,27 @@ function updateLoop() {
 
     jm.js.clearTrackedChanges()
   }
+
   if (messages.length > 0) {
-    console.log(messages)
+    const message = messages.join("")
+    const debug = message.split("").map(c => "0" + c.charCodeAt(0).toString(16))
+      .map(s => s.substring(s.length - 2, s.length)).join(" ")
+    console.log(`[SERIAL]: Writing ${debug}`)
+    board.write(message)
   }
 }
 
-setInterval(() => {
-  updateLoop()
-}, 1000 / 20)
+board.open((error) => {
+  if (error) {
+    console.log("Could not connect to board")
+    process.exit()
+  }
+
+  console.log("Connected to board!")
+
+  board.on("data", (data) => console.log(`[SERIAL]: ${data}`))
+
+  setInterval(() => {
+    updateLoop()
+  }, 1000 / 20)
+})

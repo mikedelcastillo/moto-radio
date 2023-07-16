@@ -12,12 +12,13 @@ const lines = [
 const run = async () => {
   const defineValues: Array<[string, string]> = [
     ["SERIAL_BAUDRATE", CONSTS.SERIAL_BAUDRATE.toString()],
+    ["INT_MAX_VALUE", CONSTS.INT_MAX_VALUE.toString()],
     ["MAX_CONTROLLERS", CONSTS.MAX_CONTROLLERS.toString()],
     ["MAX_RADIO_ADDRESSES", CONSTS.MAX_RADIO_ADDRESSES.toString()],
   ]
 
   for (const key in CONSTS.BYTES) {
-    defineValues.push([`${key}_BYTE`, CONSTS.BYTES[key].charCodeAt(0).toString()])
+    defineValues.push([`${key}_BYTE`, CONSTS.BYTES[key as CONSTS.ByteKeys].charCodeAt(0).toString()])
   }
 
   // #define values
@@ -29,7 +30,7 @@ const run = async () => {
   // Int parser
   lines.push("")
   lines.push(...[
-    "int parseIntFromChar(char value){",
+    "int parseIntFromChar(uint8_t value){",
     `  if(value < ${CONSTS.INT_START_BYTE}) { return 0; }`,
     `  if(value > ${CONSTS.INT_START_BYTE + CONSTS.INT_MAX_VALUE}) { return ${CONSTS.INT_MAX_VALUE}; }`,
     `  return value - ${CONSTS.INT_START_BYTE};`,
@@ -39,7 +40,7 @@ const run = async () => {
   // Float parser
   lines.push("")
   lines.push(...[
-    "float parseFloatFromChar(char value){",
+    "float parseFloatFromChar(uint8_t value){",
     `  return ((float) parseIntFromChar(value)) / ((float) ${CONSTS.INT_MAX_VALUE});`,
     "}",
   ])
@@ -51,7 +52,7 @@ const run = async () => {
   // Controller type helper
   lines.push("")
   lines.push(...[
-    `${CONSTS.CONTROLLER_INPUT_ENUM_VAR} get${CONSTS.CONTROLLER_INPUT_ENUM_VAR}(char value){`,
+    `${CONSTS.CONTROLLER_INPUT_ENUM_VAR} get${CONSTS.CONTROLLER_INPUT_ENUM_VAR}(uint8_t value){`,
     ...CONSTS.CONTROLLER_INPUT_ENUM.map(type =>
       `  if(value == ${CONSTS.BYTES[type].charCodeAt(0)}) { return ${CONSTS.CONTROLLER_INPUT_ENUM_PREFIX}${type}; }`),
     "}",
@@ -76,7 +77,7 @@ const run = async () => {
   // Controller struct set via char
   lines.push("")
   lines.push(...[
-    `void setControllerInputValue(ControllerInput *cinput, byte input, byte value){`,
+    `void setControllerInputValue(ControllerInput *cinput, uint8_t input, uint8_t value){`,
     `  uint8_t intValue = parseIntFromChar(value);`,
     ...CONSTS.CONTROLLER_INPUT_ENUM.map(type =>
       `  if(input == ${CONSTS.BYTES[type].charCodeAt(0)}) { cinput->${type} = intValue; }`),
@@ -85,7 +86,7 @@ const run = async () => {
 
   // Radio addresses
   lines.push("")
-  lines.push(`byte RADIO_ADDRESSES[][${CONSTS.RADIO_ADDRESSES.length}] = {\n${CONSTS.RADIO_ADDRESSES.map(word => "  " + JSON.stringify(word)).join(",\n")},\n};`)
+  lines.push(`uint8_t RADIO_ADDRESSES[][${CONSTS.RADIO_ADDRESSES.length}] = {\n${CONSTS.RADIO_ADDRESSES.map(word => "  " + JSON.stringify(word)).join(",\n")},\n};`)
 
   const output = lines.join("\n")
   await fs.promises.writeFile(OUT_PATH, output)

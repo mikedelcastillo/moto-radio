@@ -1,7 +1,7 @@
 #include "constants.h"
 #include "radio.h"
 
-void setupRadioReceiver(RF24 *radio, byte *address)
+void setupRadioReceiver(RF24 *radio, uint8_t *address)
 {
   setupRadio(radio);
   radio->openReadingPipe(1, address);

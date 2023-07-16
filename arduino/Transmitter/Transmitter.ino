@@ -2,6 +2,9 @@
 
 #include "lib/constants.h"
 #include "lib/radio.h"
+#include "lib/timing.h"
+
+#define BUFFER_LENGTH 4
 
 typedef struct
 {
@@ -10,8 +13,13 @@ typedef struct
 
 Controller CONTROLLERS[MAX_CONTROLLERS] = {{0}, {1}, {2}, {3}};
 
+uint8_t serialBuffer[BUFFER_LENGTH];
+uint8_t serialBufferLength = 0;
+
 RF24 radio(8, 9);
 LiquidCrystal_I2C lcd(0x27, 20, 4);
+
+Timing tLcd(TIMING_MILLIS, 250);
 
 void setup()
 {
@@ -31,51 +39,85 @@ bool isSafeControllerIndex(uint8_t index)
 
 void loop()
 {
+  updateSerial();
+  processMessage();
+  updateLcd();
+}
+
+void updateSerial()
+{
   if (Serial.available())
   {
-    byte start = Serial.read();
-
-    if (start == CONTROLLER_ADDRESS_BYTE)
+    uint8_t value = Serial.read();
+    if (serialBufferLength == 0)
     {
-      uint8_t index = parseIntFromChar(Serial.read());
-      uint8_t channel = parseIntFromChar(Serial.read());
-      bool safeIndex = isSafeControllerIndex(index);
-      bool safeChannel = channel >= 0 && channel < MAX_RADIO_ADDRESSES;
-      if (safeIndex && safeChannel)
+      // Check if starting byte is valid
+      if (value == CONTROLLER_INPUT_BYTE)
       {
-        CONTROLLERS[index].addressIndex = channel;
+      }
+      else
+      {
+        // Do not allow invalid start byte to enter buffer
+        return;
       }
     }
-
-    if (start == CONTROLLER_INPUT_BYTE)
+    serialBuffer[serialBufferLength] = value;
+    serialBufferLength++;
+    // Overflow if buffer is not used
+    if (serialBufferLength > BUFFER_LENGTH)
     {
-      uint8_t index = parseIntFromChar(Serial.read());
-      byte input = Serial.read();
-      byte value = Serial.read();
-      bool safeIndex = isSafeControllerIndex(index);
-      if (safeIndex)
+      serialBufferLength = 0;
+    }
+  }
+}
+
+void processMessage()
+{
+  if (serialBuffer[0] == CONTROLLER_INPUT_BYTE && serialBufferLength == 4)
+  {
+    serialBufferLength = 0;
+    uint8_t index = parseIntFromChar(serialBuffer[1]);
+    uint8_t input = serialBuffer[2];
+    uint8_t value = serialBuffer[3];
+
+    bool safeIndex = isSafeControllerIndex(index);
+    if (safeIndex)
+    {
+      // Check if center button is pressed
+      bool isButtonCenter = getControllerInputType(input) == CI_BUTTON_CENTER;
+      bool isPressing = parseIntFromChar(value) == INT_MAX_VALUE;
+      if (isButtonCenter && isPressing)
       {
+        // Update controller channel
+        int nextIndex = CONTROLLERS[index].addressIndex + 1;
+        CONTROLLERS[index].addressIndex = nextIndex >= MAX_RADIO_ADDRESSES ? 0 : nextIndex;
+      }
+      else
+      {
+        // Transmit data
         Controller controller = CONTROLLERS[index];
         radio.stopListening();
         radio.openWritingPipe(RADIO_ADDRESSES[controller.addressIndex]);
         RadioData data;
         data.input = input;
         data.value = value;
-        radio.write(&data, sizeof(RadioData));
-        Serial.print("Sent ");
-        Serial.print(data.input);
-        Serial.print(data.value);
-        Serial.print(" to ");
-        Serial.println(index);
+        radio.writeFast(&data, sizeof(RadioData));
       }
     }
   }
-  for (int i = 0; i < min(4, MAX_CONTROLLERS); i++)
+}
+
+void updateLcd()
+{
+  if (tLcd.poll())
   {
-    lcd.setCursor(0, i);
-    lcd.print("Input");
-    lcd.print(i + 1);
-    lcd.print(": CH#");
-    lcd.print(CONTROLLERS[i].addressIndex);
+    for (int i = 0; i < min(4, MAX_CONTROLLERS); i++)
+    {
+      lcd.setCursor(0, i);
+      lcd.print("Input");
+      lcd.print(i + 1);
+      lcd.print(": CH#");
+      lcd.print(CONTROLLERS[i].addressIndex);
+    }
   }
 }
