@@ -45,6 +45,14 @@ const run = async () => {
     "}",
   ])
 
+  // Int to float
+  lines.push("")
+  lines.push(...[
+    "float intToFloat(uint8_t value){",
+    `  return ((float) value) / ((float) ${CONSTS.INT_MAX_VALUE});`,
+    "}",
+  ])
+
   // Controller enum
   lines.push("")
   lines.push(`enum ${CONSTS.CONTROLLER_INPUT_ENUM_VAR} {\n${CONSTS.CONTROLLER_INPUT_ENUM.map(type => `  ${CONSTS.CONTROLLER_INPUT_ENUM_PREFIX}${type}`).join(",\n")},\n};`)

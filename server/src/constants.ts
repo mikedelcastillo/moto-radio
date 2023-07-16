@@ -1,6 +1,6 @@
 export const SERIAL_BAUDRATE = 115200
 export const MAX_CONTROLLERS = 4
-export const INT_MAX_VALUE = 128
+export const INT_MAX_VALUE = 255
 export const INT_START_BYTE = 0
 
 export const RADIO_ADDRESSES = [
@@ -23,9 +23,9 @@ export const CONTROLLER_INPUT_ENUM = [
   "BUTTON_Y",
   "BUTTON_START",
   "BUTTON_SELECT",
-  "BUTTON_LT",
+  "AXIS_LT",
+  "AXIS_RT",
   "BUTTON_LB",
-  "BUTTON_RT",
   "BUTTON_RB",
   "BUTTON_DU",
   "BUTTON_DD",

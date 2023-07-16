@@ -6,6 +6,12 @@
 
 #define BUFFER_LENGTH 4
 
+#define RF24_CE_PIN 8
+#define RF24_CSN_PIN 9
+
+RF24 radio(RF24_CE_PIN, RF24_CSN_PIN);
+LiquidCrystal_I2C lcd(0x27, 20, 4);
+
 typedef struct
 {
   uint8_t addressIndex;
@@ -15,9 +21,6 @@ Controller CONTROLLERS[MAX_CONTROLLERS] = {{0}, {1}, {2}, {3}};
 
 uint8_t serialBuffer[BUFFER_LENGTH];
 uint8_t serialBufferLength = 0;
-
-RF24 radio(8, 9);
-LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 Timing tLcd(TIMING_MILLIS, 250);
 

@@ -59,7 +59,7 @@ export const JOYSTICK_MAPPINGS: Record<JoystickMapping, JoystickMap> = {
         { type: "AXIS_LYD", value: value > 0 ? Math.abs(value) : 0 },
       ]
       if (input.number === 2) return [
-        { type: "BUTTON_LT", value: posValue },
+        { type: "AXIS_LT", value: posValue },
       ]
       if (input.number === 3) return [
         { type: "AXIS_RXL", value: value < 0 ? Math.abs(value) : 0 },
@@ -70,7 +70,7 @@ export const JOYSTICK_MAPPINGS: Record<JoystickMapping, JoystickMap> = {
         { type: "AXIS_RYD", value: value > 0 ? Math.abs(value) : 0 },
       ]
       if (input.number === 5) return [
-        { type: "BUTTON_RT", value: posValue },
+        { type: "AXIS_RT", value: posValue },
       ]
       if (input.number === 6) return [
         { type: "BUTTON_DL", value: value < 0 ? Math.abs(value) : 0 },
@@ -133,10 +133,10 @@ export const JOYSTICK_MAPPINGS: Record<JoystickMapping, JoystickMap> = {
         { type: "AXIS_RYD", value: value > 0 ? Math.abs(value) : 0 },
       ]
       if (input.number === 4) return [
-        { type: "BUTTON_RT", value: posValue },
+        { type: "AXIS_RT", value: posValue },
       ]
       if (input.number === 5) return [
-        { type: "BUTTON_LT", value: posValue },
+        { type: "AXIS_LT", value: posValue },
       ]
       if (input.number === 6) return [
         { type: "BUTTON_DL", value: value < 0 ? Math.abs(value) : 0 },
