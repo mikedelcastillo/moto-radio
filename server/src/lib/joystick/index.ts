@@ -8,7 +8,7 @@ export type JoystickEventMap = {
   error: NodeJS.ErrnoException,
   rawInput: JoystickInput,
   input: JoystickMappedInput,
-  change: undefined,
+  change: ControllerInput[],
 }
 
 type JoystickValues = {
@@ -115,7 +115,7 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
         this.values[mappedInput.type] = mappedInput.value
         if (!this.trackedChanges.includes(mappedInput.type)) {
           this.trackedChanges.push(mappedInput.type)
-          this.trigger("change")
+          this.trigger("change", this.trackedChanges)
         }
       }
       this.trigger("input", mappedInput)

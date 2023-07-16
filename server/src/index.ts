@@ -24,20 +24,29 @@ import { createInputMessage } from "./lib/message";
 const joystickManagers: JoystickManager[] = []
 
 for (let i = 0; i < MAX_CONTROLLERS; i++) {
-  joystickManagers.push(new JoystickManager(i))
+  const jm = new JoystickManager(i)
+  joystickManagers.push(jm)
+  if (typeof process.env.DEBUG_JM_INPUT) {
+    jm.on("change", (changes) => {
+      console.log(changes)
+    })
+  }
 }
 
 function updateLoop() {
   const messages: string[] = []
   for (let i = 0; i < joystickManagers.length; i++) {
     const jm = joystickManagers[i]
-    const changes = jm.js?.trackedChanges || []
+    if (typeof jm.js === "undefined") continue
+
+    const changes = jm.js.trackedChanges
     if (changes.length > 0) {
       for (const change of changes) {
         messages.push(createInputMessage(i, change, jm.js?.values[change] || 0))
       }
     }
-    jm.js?.clearTrackedChanges()
+
+    jm.js.clearTrackedChanges()
   }
   if (messages.length > 0) {
     console.log(messages)

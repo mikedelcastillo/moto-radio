@@ -33,7 +33,7 @@ export class JoystickManager extends EventBus<JoystickManagerEventMap>{
         this.retry()
         this.trigger("error", err)
       })
-      this.js.on("change", () => this.trigger("change"))
+      this.js.on("change", (args) => this.trigger("change", args))
       this.js.on("input", (args) => this.trigger("input", args))
       this.js.on("rawInput", (args) => this.trigger("rawInput", args))
       await this.js.open()
