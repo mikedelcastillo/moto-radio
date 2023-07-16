@@ -12,7 +12,16 @@ type JoystickEventMap = {
   },
 }
 
+type JoystickValues = {
+  buttons: Record<number, number>,
+  axes: Record<number, number>
+}
+
 export class LinuxJoystick extends EventBus<JoystickEventMap>{
+  values: JoystickValues = {
+    buttons: {},
+    axes: {},
+  }
   id: number
   private buffer: Buffer = Buffer.alloc(8)
   private fd?: number
@@ -20,6 +29,13 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
   constructor(id: number) {
     super()
     this.id = id
+  }
+
+  resetValues() {
+    this.values = {
+      buttons: {},
+      axes: {},
+    }
   }
 
   open() {
@@ -50,6 +66,7 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
       value: this.buffer.readInt16LE(4),
       init: !!(this.buffer[6] & 0x80)
     }
+    this.values[payload.type === "button" ? "buttons" : "axes"][payload.number] = payload.value
     this.trigger("input", payload)
     if (this.fd) this.read()
   }
@@ -59,6 +76,7 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
       if (typeof this.fd === "undefined") return reject()
       close(this.fd, () => {
         this.fd = undefined
+        this.resetValues()
         resolve()
       })
     })

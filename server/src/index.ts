@@ -25,9 +25,10 @@ const run = async () => {
     console.warn(err)
     process.exit()
   })
-  js0.on("input", console.log)
+  js0.on("input", () => {
+    console.log(js0.values)
+  })
   await js0.open()
-  console.log(js0)
 }
 
 run()
