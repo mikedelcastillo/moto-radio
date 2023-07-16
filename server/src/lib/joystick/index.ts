@@ -47,7 +47,7 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
       type: this.buffer[6] & 0x01 ? "button" : "axis", // 0x02 axis
       time: this.buffer.readUint32LE(0),
       number: this.buffer[7],
-      value: this.buffer.readInt16LE(),
+      value: this.buffer.readInt16LE(4),
       init: !!(this.buffer[6] & 0x80)
     }
     this.trigger("input", payload)
