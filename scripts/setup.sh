@@ -4,4 +4,9 @@ sudo apt-get install -y nodejs
 sudo apt update -y
 sudo apt upgrade -y
 
-sudo npm install -g yarn
+sudo npm install -g yarn pm2
+
+cd server
+
+yarn
+yarn build
