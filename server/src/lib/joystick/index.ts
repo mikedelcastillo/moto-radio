@@ -30,6 +30,7 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
           return reject()
         }
         this.fd = fd
+        this.read()
         resolve()
       })
     })
