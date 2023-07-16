@@ -29,7 +29,7 @@ const run = async () => {
   //   console.log(JSON.stringify(js0.values))
   // })
   js0.on("change", () => {
-    console.log(js0.changedInputs)
+    console.log(js0.trackedChanges)
   })
   setInterval(() => {
     js0.clearTrackedChanges()

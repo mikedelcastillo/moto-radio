@@ -27,7 +27,7 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
     axes: {},
   }
   values = {} as Record<ControllerInput, number>
-  changedInputs: ControllerInput[] = []
+  trackedChanges: ControllerInput[] = []
 
   constructor(id: number) {
     super()
@@ -47,7 +47,7 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
   }
 
   clearTrackedChanges() {
-    this.changedInputs = []
+    this.trackedChanges = []
   }
 
   async open() {
@@ -102,7 +102,8 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
     for (const mappedInput of mappedInputs) {
       if (this.values[mappedInput.type] !== mappedInput.value) {
         this.values[mappedInput.type] = mappedInput.value
-        if (!this.changedInputs.includes(mappedInput.type)) {
+        if (!this.trackedChanges.includes(mappedInput.type)) {
+          this.trackedChanges.push(mappedInput.type)
           this.trigger("change")
         }
       }
