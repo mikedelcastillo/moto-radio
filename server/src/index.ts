@@ -26,11 +26,6 @@ const joystickManagers: JoystickManager[] = []
 for (let i = 0; i < MAX_CONTROLLERS; i++) {
   const jm = new JoystickManager(i)
   joystickManagers.push(jm)
-  if (typeof process.env.DEBUG_JM_INPUT) {
-    jm.on("change", (changes) => {
-      console.log(changes)
-    })
-  }
 }
 
 function updateLoop() {
@@ -53,6 +48,6 @@ function updateLoop() {
   }
 }
 
-setTimeout(() => {
+setInterval(() => {
   updateLoop()
 }, 1000 / 20)
