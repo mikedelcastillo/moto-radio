@@ -25,9 +25,15 @@ const run = async () => {
     console.warn(err)
     process.exit()
   })
-  js0.on("input", (input) => {
-    console.log(JSON.stringify(js0.values))
+  // js0.on("input", (input) => {
+  //   console.log(JSON.stringify(js0.values))
+  // })
+  js0.on("change", () => {
+    console.log(js0.changedInputs)
   })
+  setInterval(() => {
+    js0.clearTrackedChanges()
+  }, 1000)
   await js0.open()
 }
 

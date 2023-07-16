@@ -8,6 +8,7 @@ type JoystickEventMap = {
   error: NodeJS.ErrnoException,
   rawInput: JoystickInput,
   input: JoystickMappedInput,
+  change: undefined,
 }
 
 type JoystickValues = {
@@ -16,15 +17,17 @@ type JoystickValues = {
 }
 
 export class LinuxJoystick extends EventBus<JoystickEventMap>{
-  map = JoystickMapping.MICROSOFT_XBOX_ONE
   private path = ""
+  private buffer: Buffer = Buffer.alloc(8)
+  private fd?: number
+
+  map = JoystickMapping.MICROSOFT_XBOX_ONE
   rawValues: JoystickValues = {
     buttons: {},
     axes: {},
   }
   values = {} as Record<ControllerInput, number>
-  private buffer: Buffer = Buffer.alloc(8)
-  private fd?: number
+  changedInputs: ControllerInput[] = []
 
   constructor(id: number) {
     super()
@@ -40,6 +43,11 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
     for (const key of CONTROLLER_INPUT_ENUM) {
       this.values[key] = 0
     }
+    this.clearTrackedChanges()
+  }
+
+  clearTrackedChanges() {
+    this.changedInputs = []
   }
 
   async open() {
@@ -92,7 +100,12 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
     this.trigger("rawInput", payload)
     const mappedInputs = JOYSTICK_MAPPINGS[this.map](payload)
     for (const mappedInput of mappedInputs) {
-      this.values[mappedInput.type] = mappedInput.value
+      if (this.values[mappedInput.type] !== mappedInput.value) {
+        this.values[mappedInput.type] = mappedInput.value
+        if (!this.changedInputs.includes(mappedInput.type)) {
+          this.trigger("change")
+        }
+      }
       this.trigger("input", mappedInput)
     }
     if (this.fd) this.read()
