@@ -4,6 +4,7 @@
 
 import { MAX_CONTROLLERS } from "./constants";
 import { JoystickManager } from "./lib/joystick/manager";
+import { createInputMessage } from "./lib/message";
 
 // const board = new SerialPort({
 //   path: "/dev/ttyUSB0",
@@ -27,12 +28,19 @@ for (let i = 0; i < MAX_CONTROLLERS; i++) {
 }
 
 function updateLoop() {
-  for (const jm of joystickManagers) {
-    jm.js?.clearTrackedChanges()
+  const messages: string[] = []
+  for (let i = 0; i < joystickManagers.length; i++) {
+    const jm = joystickManagers[i]
     const changes = jm.js?.trackedChanges || []
-    if (changes.length) {
-      console.log(changes)
+    if (changes.length > 0) {
+      for (const change of changes) {
+        messages.push(createInputMessage(i, change, jm.js?.values[change] || 0))
+      }
     }
+    jm.js?.clearTrackedChanges()
+  }
+  if (messages.length > 0) {
+    console.log(messages)
   }
 }
 
