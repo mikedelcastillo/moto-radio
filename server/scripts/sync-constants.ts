@@ -12,7 +12,7 @@ const lines = [
 const run = async () => {
   const defineValues: Array<[string, string]> = [
     ["SERIAL_BAUDRATE", CONSTS.SERIAL_BAUDRATE.toString()],
-    ["INT_MAX_VALUE", CONSTS.INT_MAX_VALUE.toString()],
+    ["MAX_INT_RADIO_VALUE", CONSTS.MAX_INT_RADIO_VALUE.toString()],
     ["MAX_CONTROLLERS", CONSTS.MAX_CONTROLLERS.toString()],
     ["MAX_RADIO_ADDRESSES", CONSTS.MAX_RADIO_ADDRESSES.toString()],
   ]
@@ -32,7 +32,7 @@ const run = async () => {
   lines.push(...[
     "int parseIntFromChar(uint8_t value){",
     `  if(value < ${CONSTS.INT_START_BYTE}) { return 0; }`,
-    `  if(value > ${CONSTS.INT_START_BYTE + CONSTS.INT_MAX_VALUE}) { return ${CONSTS.INT_MAX_VALUE}; }`,
+    `  if(value > ${CONSTS.INT_START_BYTE + CONSTS.MAX_INT_RADIO_VALUE}) { return ${CONSTS.MAX_INT_RADIO_VALUE}; }`,
     `  return value - ${CONSTS.INT_START_BYTE};`,
     "}",
   ])
@@ -41,7 +41,7 @@ const run = async () => {
   lines.push("")
   lines.push(...[
     "float parseFloatFromChar(uint8_t value){",
-    `  return ((float) parseIntFromChar(value)) / ((float) ${CONSTS.INT_MAX_VALUE});`,
+    `  return ((float) parseIntFromChar(value)) / ((float) ${CONSTS.MAX_INT_RADIO_VALUE});`,
     "}",
   ])
 
@@ -49,13 +49,14 @@ const run = async () => {
   lines.push("")
   lines.push(...[
     "float intToFloat(uint8_t value){",
-    `  return ((float) value) / ((float) ${CONSTS.INT_MAX_VALUE});`,
+    `  return ((float) value) / ((float) ${CONSTS.MAX_INT_RADIO_VALUE});`,
     "}",
   ])
 
   // Controller enum
   lines.push("")
   lines.push(`enum ${CONSTS.CONTROLLER_INPUT_ENUM_VAR} {\n${CONSTS.CONTROLLER_INPUT_ENUM.map(type => `  ${CONSTS.CONTROLLER_INPUT_ENUM_PREFIX}${type}`).join(",\n")},\n};`)
+
 
   // Controller type helper
   lines.push("")
@@ -66,11 +67,20 @@ const run = async () => {
     "}",
   ])
 
+  // Controller value struct
+  lines.push("")
+  lines.push(...[
+    `typedef struct {`,
+    `  uint8_t pos = 0;`,
+    `  uint8_t neg = 0;`,
+    `} ControllerValue;`
+  ])
+
   // Controller input struct
   lines.push("")
   lines.push(...[
     `typedef struct {`,
-    ...CONSTS.CONTROLLER_INPUT_ENUM.map(type => `  uint8_t ${type};`),
+    ...CONSTS.CONTROLLER_INPUT_ENUM.map(type => `  ControllerValue ${type};`),
     `} ControllerInput;`,
   ])
 
@@ -78,17 +88,19 @@ const run = async () => {
   lines.push("")
   lines.push(...[
     `void resetControllerInput(ControllerInput *cinput){`,
-    ...CONSTS.CONTROLLER_INPUT_ENUM.map(type => `  cinput->${type} = 0;`),
+    ...CONSTS.CONTROLLER_INPUT_ENUM.map(type => [
+      `  ControllerValue ${type}_VAL;`,
+      `  cinput->${type} = ${type}_VAL;`,
+    ].join("\n")),
     `}`,
   ])
 
   // Controller struct set via char
   lines.push("")
   lines.push(...[
-    `void setControllerInputValue(ControllerInput *cinput, uint8_t input, uint8_t value){`,
-    `  uint8_t intValue = parseIntFromChar(value);`,
+    `void setControllerInputValue(ControllerInput *cinput, uint8_t input, ControllerValue value){`,
     ...CONSTS.CONTROLLER_INPUT_ENUM.map(type =>
-      `  if(input == ${CONSTS.BYTES[type].charCodeAt(0)}) { cinput->${type} = intValue; }`),
+      `  if(input == ${CONSTS.BYTES[type].charCodeAt(0)}) { cinput->${type} = value; }`),
     `}`,
   ])
 

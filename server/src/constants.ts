@@ -1,6 +1,4 @@
 export const SERIAL_BAUDRATE = 115200
-export const MAX_CONTROLLERS = 4
-export const INT_MAX_VALUE = 255
 export const INT_START_BYTE = 0
 
 export const RADIO_ADDRESSES = [
@@ -9,9 +7,12 @@ export const RADIO_ADDRESSES = [
 ]
 
 export const MAX_RADIO_ADDRESSES = RADIO_ADDRESSES.length
+export const MAX_CONTROLLERS = 4
+export const MAX_INT_RADIO_VALUE = 255
 
 export const MESSAGE_BYTE_KEYS = [
   "CONTROLLER_INPUT",
+  "CONTROLLER_CLEAR",
 ] as const
 
 export const CONTROLLER_INPUT_ENUM_VAR = "ControllerInputType"
@@ -33,14 +34,10 @@ export const CONTROLLER_INPUT_ENUM = [
   "BUTTON_DR",
   "BUTTON_LS",
   "BUTTON_RS",
-  "AXIS_LXL",
-  "AXIS_LXR",
-  "AXIS_LYU",
-  "AXIS_LYD",
-  "AXIS_RXL",
-  "AXIS_RXR",
-  "AXIS_RYU",
-  "AXIS_RYD",
+  "AXIS_LSX",
+  "AXIS_LSY",
+  "AXIS_RSX",
+  "AXIS_RSY",
   "BUTTON_CENTER",
   "IGNORE",
 ] as const
@@ -52,6 +49,7 @@ export type ByteKeys = typeof BYTE_KEYS[number]
 
 export const BYTES = {
   CONTROLLER_INPUT: "i",
+  CONTROLLER_CLEAR: "c",
 } as Record<ByteKeys, string>
 
 for (let i = 0; i < CONTROLLER_INPUT_ENUM.length; i++) {

@@ -4,8 +4,10 @@
 
 typedef struct
 {
+  uint8_t type;
   uint8_t input;
-  uint8_t value;
+  uint8_t valuePos;
+  uint8_t valueNeg;
 } RadioData;
 
 void setupRadio(RF24 *radio)

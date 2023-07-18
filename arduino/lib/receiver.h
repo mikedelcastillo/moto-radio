@@ -14,6 +14,9 @@ void updateRadioInput(RF24 *radio, ControllerInput *cinput)
   {
     RadioData data;
     radio->read(&data, sizeof(RadioData));
-    setControllerInputValue(cinput, data.input, data.value);
+    ControllerValue value;
+    value.pos = parseIntFromChar(data.valuePos);
+    value.neg = parseIntFromChar(data.valueNeg);
+    setControllerInputValue(cinput, data.input, value);
   }
 }

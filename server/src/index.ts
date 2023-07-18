@@ -29,7 +29,8 @@ function updateLoop() {
     const changes = jm.js.trackedChanges
     if (changes.length > 0) {
       for (const change of changes) {
-        messages.push(createInputMessage(i, change, jm.js?.values[change] || 0))
+        const value = jm.js?.values[change] || { pos: 0, neg: 0 }
+        messages.push(createInputMessage(i, change, value.pos, value.neg))
       }
     }
 

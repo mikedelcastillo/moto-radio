@@ -4,7 +4,7 @@
 #include "lib/radio.h"
 #include "lib/timing.h"
 
-#define BUFFER_LENGTH 4
+#define BUFFER_LENGTH 5
 
 #define RF24_CE_PIN 8
 #define RF24_CSN_PIN 9
@@ -76,19 +76,20 @@ void updateSerial()
 
 void processMessage()
 {
-  if (serialBuffer[0] == CONTROLLER_INPUT_BYTE && serialBufferLength == 4)
+  if (serialBuffer[0] == CONTROLLER_INPUT_BYTE && serialBufferLength == 5)
   {
     serialBufferLength = 0;
     uint8_t index = parseIntFromChar(serialBuffer[1]);
     uint8_t input = serialBuffer[2];
-    uint8_t value = serialBuffer[3];
+    uint8_t valuePos = serialBuffer[3];
+    uint8_t valueNeg = serialBuffer[4];
 
     bool safeIndex = isSafeControllerIndex(index);
     if (safeIndex)
     {
       // Check if center button is pressed
       bool isButtonCenter = getControllerInputType(input) == CI_BUTTON_CENTER;
-      bool isPressing = parseIntFromChar(value) == INT_MAX_VALUE;
+      bool isPressing = parseIntFromChar(valuePos) == MAX_INT_RADIO_VALUE;
       if (isButtonCenter && isPressing)
       {
         // Update controller channel
@@ -102,8 +103,10 @@ void processMessage()
         radio.stopListening();
         radio.openWritingPipe(RADIO_ADDRESSES[controller.addressIndex]);
         RadioData data;
+        data.type = CONTROLLER_INPUT_BYTE;
         data.input = input;
-        data.value = value;
+        data.valuePos = valuePos;
+        data.valueNeg = valueNeg;
         radio.writeFast(&data, sizeof(RadioData));
       }
     }

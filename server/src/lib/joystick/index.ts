@@ -11,6 +11,11 @@ export type JoystickEventMap = {
   change: ControllerInput[],
 }
 
+export type JoystickValue = {
+  pos: number,
+  neg: number,
+}
+
 type JoystickValues = {
   buttons: Record<number, number>,
   axes: Record<number, number>
@@ -27,7 +32,7 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
     buttons: {},
     axes: {},
   }
-  values = {} as Record<ControllerInput, number>
+  values = {} as Record<ControllerInput, JoystickValue>
   trackedChanges: ControllerInput[] = []
 
   constructor(id: number) {
@@ -47,7 +52,9 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
       axes: {},
     }
     for (const key of CONTROLLER_INPUT_ENUM) {
-      this.values[key] = 0
+      this.values[key] = {
+        pos: 0, neg: 0,
+      }
     }
     this.clearTrackedChanges()
   }
@@ -110,16 +117,22 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
     this.trigger("rawInput", payload)
     this.log(`Raw: ${payload.time} ${payload.type} ${payload.number} ${payload.value}`)
     const mappedInputs = JOYSTICK_MAPPINGS[this.map](payload)
-    for (const mappedInput of mappedInputs) {
-      if (this.values[mappedInput.type] !== mappedInput.value) {
-        this.values[mappedInput.type] = mappedInput.value
-        if (!this.trackedChanges.includes(mappedInput.type)) {
-          this.trackedChanges.push(mappedInput.type)
+    for (const newValue of mappedInputs) {
+      const oldValue = this.values[newValue.type]
+      const posChanged = oldValue.pos !== newValue.valuePos
+      const negChanged = oldValue.neg !== newValue.valueNeg
+      if (posChanged || negChanged) {
+        this.values[newValue.type] = {
+          pos: newValue.valuePos,
+          neg: newValue.valueNeg,
+        }
+        if (!this.trackedChanges.includes(newValue.type)) {
+          this.trackedChanges.push(newValue.type)
           this.trigger("change", this.trackedChanges)
         }
       }
-      this.trigger("input", mappedInput)
-      this.log(`Mapped: ${mappedInput.type} ${mappedInput.value}`)
+      this.trigger("input", newValue)
+      this.log(`Mapped: ${newValue.type} ${newValue.valuePos}`)
     }
     if (this.fd) this.read()
   }

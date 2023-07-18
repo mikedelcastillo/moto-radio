@@ -1,4 +1,4 @@
-import { ControllerInput, INT_MAX_VALUE } from "../../constants"
+import { ControllerInput, MAX_INT_RADIO_VALUE } from "../../constants"
 
 const MAX_16_BIT_INT_VALUE = Math.pow(2, 15) - 1
 
@@ -12,7 +12,8 @@ export type JoystickInput = {
 
 export type JoystickMappedInput = {
   type: ControllerInput,
-  value: number,
+  valuePos: number,
+  valueNeg: number,
 }
 
 export enum JoystickMapping {
@@ -27,7 +28,8 @@ export const JOYSTICK_MAPPINGS: Record<JoystickMapping, JoystickMap> = {
     if (input.type === "button") {
       const output: JoystickMappedInput = {
         type: "IGNORE",
-        value: input.value === 0 ? 0 : INT_MAX_VALUE,
+        valuePos: input.value === 0 ? 0 : MAX_INT_RADIO_VALUE,
+        valueNeg: 0,
       }
       const order: ControllerInput[] = [
         "BUTTON_A",
@@ -48,37 +50,33 @@ export const JOYSTICK_MAPPINGS: Record<JoystickMapping, JoystickMap> = {
       }
     }
     if (input.type === "axis") {
-      const value = Math.round((input.value / MAX_16_BIT_INT_VALUE) * INT_MAX_VALUE)
-      const posValue = Math.round((input.value + MAX_16_BIT_INT_VALUE) / (MAX_16_BIT_INT_VALUE * 2 + 1) * INT_MAX_VALUE)
+      const value = Math.round((input.value / MAX_16_BIT_INT_VALUE) * MAX_INT_RADIO_VALUE)
+      const valueFull = Math.round((input.value + MAX_16_BIT_INT_VALUE) / (MAX_16_BIT_INT_VALUE * 2 + 1) * MAX_INT_RADIO_VALUE)
+      const valuePos = value < 0 ? Math.abs(value) : 0
+      const valueNeg = value > 0 ? Math.abs(value) : 0
       if (input.number === 0) return [
-        { type: "AXIS_LXL", value: value < 0 ? Math.abs(value) : 0 },
-        { type: "AXIS_LXR", value: value > 0 ? Math.abs(value) : 0 },
+        { type: "AXIS_LSX", valuePos, valueNeg },
       ]
       if (input.number === 1) return [
-        { type: "AXIS_LYU", value: value < 0 ? Math.abs(value) : 0 },
-        { type: "AXIS_LYD", value: value > 0 ? Math.abs(value) : 0 },
+        { type: "AXIS_LSY", valuePos, valueNeg },
       ]
       if (input.number === 2) return [
-        { type: "AXIS_LT", value: posValue },
+        { type: "AXIS_LT", valuePos: valueFull, valueNeg: 0 },
       ]
       if (input.number === 3) return [
-        { type: "AXIS_RXL", value: value < 0 ? Math.abs(value) : 0 },
-        { type: "AXIS_RXR", value: value > 0 ? Math.abs(value) : 0 },
+        { type: "AXIS_RSX", valuePos, valueNeg },
       ]
       if (input.number === 4) return [
-        { type: "AXIS_RYU", value: value < 0 ? Math.abs(value) : 0 },
-        { type: "AXIS_RYD", value: value > 0 ? Math.abs(value) : 0 },
+        { type: "AXIS_RSY", valuePos, valueNeg },
       ]
       if (input.number === 5) return [
-        { type: "AXIS_RT", value: posValue },
+        { type: "AXIS_RT", valuePos: valueFull, valueNeg: 0 },
       ]
       if (input.number === 6) return [
-        { type: "BUTTON_DL", value: value < 0 ? Math.abs(value) : 0 },
-        { type: "BUTTON_DR", value: value > 0 ? Math.abs(value) : 0 },
+        { type: "BUTTON_DL", valuePos, valueNeg },
       ]
       if (input.number === 7) return [
-        { type: "BUTTON_DU", value: value < 0 ? Math.abs(value) : 0 },
-        { type: "BUTTON_DD", value: value > 0 ? Math.abs(value) : 0 },
+        { type: "BUTTON_DU", valuePos, valueNeg },
       ]
     }
     return []
@@ -87,7 +85,8 @@ export const JOYSTICK_MAPPINGS: Record<JoystickMapping, JoystickMap> = {
     if (input.type === "button") {
       const output: JoystickMappedInput = {
         type: "IGNORE",
-        value: input.value === 0 ? 0 : INT_MAX_VALUE,
+        valuePos: input.value === 0 ? 0 : MAX_INT_RADIO_VALUE,
+        valueNeg: 0,
       }
       const order: ControllerInput[] = [
         "BUTTON_A",
@@ -114,37 +113,33 @@ export const JOYSTICK_MAPPINGS: Record<JoystickMapping, JoystickMap> = {
       }
     }
     if (input.type === "axis") {
-      const value = Math.round((input.value / MAX_16_BIT_INT_VALUE) * INT_MAX_VALUE)
-      const posValue = Math.round((input.value + MAX_16_BIT_INT_VALUE) / (MAX_16_BIT_INT_VALUE * 2 + 1) * INT_MAX_VALUE)
+      const value = Math.round((input.value / MAX_16_BIT_INT_VALUE) * MAX_INT_RADIO_VALUE)
+      const valueFull = Math.round((input.value + MAX_16_BIT_INT_VALUE) / (MAX_16_BIT_INT_VALUE * 2 + 1) * MAX_INT_RADIO_VALUE)
+      const valuePos = value < 0 ? Math.abs(value) : 0
+      const valueNeg = value > 0 ? Math.abs(value) : 0
       if (input.number === 0) return [
-        { type: "AXIS_LXL", value: value < 0 ? Math.abs(value) : 0 },
-        { type: "AXIS_LXR", value: value > 0 ? Math.abs(value) : 0 },
+        { type: "AXIS_LSX", valuePos, valueNeg },
       ]
       if (input.number === 1) return [
-        { type: "AXIS_LYU", value: value < 0 ? Math.abs(value) : 0 },
-        { type: "AXIS_LYD", value: value > 0 ? Math.abs(value) : 0 },
+        { type: "AXIS_LSY", valuePos, valueNeg },
       ]
       if (input.number === 2) return [
-        { type: "AXIS_RXL", value: value < 0 ? Math.abs(value) : 0 },
-        { type: "AXIS_RXR", value: value > 0 ? Math.abs(value) : 0 },
+        { type: "AXIS_RSX", valuePos, valueNeg },
       ]
       if (input.number === 3) return [
-        { type: "AXIS_RYU", value: value < 0 ? Math.abs(value) : 0 },
-        { type: "AXIS_RYD", value: value > 0 ? Math.abs(value) : 0 },
+        { type: "AXIS_RSY", valuePos, valueNeg },
       ]
       if (input.number === 4) return [
-        { type: "AXIS_RT", value: posValue },
+        { type: "AXIS_RT", valuePos: valueFull, valueNeg: 0 },
       ]
       if (input.number === 5) return [
-        { type: "AXIS_LT", value: posValue },
+        { type: "AXIS_LT", valuePos: valueFull, valueNeg: 0 },
       ]
       if (input.number === 6) return [
-        { type: "BUTTON_DL", value: value < 0 ? Math.abs(value) : 0 },
-        { type: "BUTTON_DR", value: value > 0 ? Math.abs(value) : 0 },
+        { type: "BUTTON_DL", valuePos, valueNeg },
       ]
       if (input.number === 7) return [
-        { type: "BUTTON_DU", value: value < 0 ? Math.abs(value) : 0 },
-        { type: "BUTTON_DD", value: value > 0 ? Math.abs(value) : 0 },
+        { type: "BUTTON_DU", valuePos, valueNeg },
       ]
     }
     return []
