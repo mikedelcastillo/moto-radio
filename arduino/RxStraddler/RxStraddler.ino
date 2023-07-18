@@ -56,35 +56,35 @@ void loop()
   updateRadioInput(&radio, &CONTROLLER_INPUT);
   if (tUpdate.poll())
   {
-    // // Update steering
-    // int steerSum = CONTROLLER_INPUT.AXIS_LSXR - CONTROLLER_INPUT.AXIS_LSXL;
-    // int steerValue = map(steerSum, -MAX_INT_RADIO_VALUE, MAX_INT_RADIO_VALUE, STEER_LEFT, STEER_RIGHT);
-    // steerServo.write(steerValue);
+    // Update steering
+    int steerSum = CONTROLLER_INPUT.AXIS_LSX.pos - CONTROLLER_INPUT.AXIS_LSX.neg;
+    int steerValue = map(steerSum, -MAX_INT_RADIO_VALUE, MAX_INT_RADIO_VALUE, STEER_LEFT, STEER_RIGHT);
+    steerServo.write(steerValue);
 
-    // // Update throttle
-    // int throttleSum = CONTROLLER_INPUT.AXIS_RT - CONTROLLER_INPUT.AXIS_LT;
-    // if (abs(throttleSum) > THROTTLE_MIN)
-    // {
-    //   int power = intToFloat(abs(throttleSum)) * MAX_PWM_VALUE;
-    //   digitalWrite(MOTOR_LEN_PIN, HIGH);
-    //   digitalWrite(MOTOR_REN_PIN, HIGH);
-    //   if (throttleSum > 0)
-    //   {
-    //     analogWrite(MOTOR_RPWM_PIN, power);
-    //     digitalWrite(MOTOR_LPWM_PIN, LOW);
-    //   }
-    //   if (throttleSum < 0)
-    //   {
-    //     digitalWrite(MOTOR_RPWM_PIN, LOW);
-    //     analogWrite(MOTOR_LPWM_PIN, power);
-    //   }
-    // }
-    // else
-    // {
-    //   digitalWrite(MOTOR_RPWM_PIN, LOW);
-    //   digitalWrite(MOTOR_LPWM_PIN, LOW);
-    //   digitalWrite(MOTOR_LEN_PIN, LOW);
-    //   digitalWrite(MOTOR_REN_PIN, LOW);
-    // }
+    // Update throttle
+    int throttleSum = CONTROLLER_INPUT.AXIS_RT.pos - CONTROLLER_INPUT.AXIS_LT.pos;
+    if (abs(throttleSum) > THROTTLE_MIN)
+    {
+      int power = intToFloat(abs(throttleSum)) * MAX_PWM_VALUE;
+      digitalWrite(MOTOR_LEN_PIN, HIGH);
+      digitalWrite(MOTOR_REN_PIN, HIGH);
+      if (throttleSum > 0)
+      {
+        analogWrite(MOTOR_RPWM_PIN, power);
+        digitalWrite(MOTOR_LPWM_PIN, LOW);
+      }
+      if (throttleSum < 0)
+      {
+        digitalWrite(MOTOR_RPWM_PIN, LOW);
+        analogWrite(MOTOR_LPWM_PIN, power);
+      }
+    }
+    else
+    {
+      digitalWrite(MOTOR_RPWM_PIN, LOW);
+      digitalWrite(MOTOR_LPWM_PIN, LOW);
+      digitalWrite(MOTOR_LEN_PIN, LOW);
+      digitalWrite(MOTOR_REN_PIN, LOW);
+    }
   }
 }
