@@ -113,7 +113,7 @@ export class LinuxJoystick extends EventBus<JoystickEventMap>{
     for (const newInput of mappedInputs) {
       const oldValue = this.values[newInput.type]
       if (oldValue !== newInput.value) {
-        this.values[newInput.type] = oldValue
+        this.values[newInput.type] = newInput.value
         if (!this.trackedChanges.includes(newInput.type)) {
           this.trackedChanges.push(newInput.type)
           this.trigger("change", this.trackedChanges)

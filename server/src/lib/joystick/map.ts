@@ -52,31 +52,42 @@ export const JOYSTICK_MAPPINGS: Record<JoystickMapping, JoystickMap> = {
       const valueFull = Math.round((input.value + MAX_16_BIT_INT_VALUE) / (MAX_16_BIT_INT_VALUE * 2 + 1) * MAX_INT_RADIO_VALUE)
       const valuePos = value < 0 ? Math.abs(value) : 0
       const valueNeg = value > 0 ? Math.abs(value) : 0
-      const valueRange = valuePos - valueNeg
+      const valueAxis = valuePos - valueNeg
+      const valueAxisAbs = Math.abs(valueAxis)
       if (input.number === 0) return [
-        { type: "AXIS_LSX", value: valueRange },
+        { type: "AXIS_LSX", value: valueAxis },
       ]
       if (input.number === 1) return [
-        { type: "AXIS_LSY", value: valueRange },
+        { type: "AXIS_LSY", value: valueAxis },
       ]
       if (input.number === 2) return [
         { type: "AXIS_LT", value: valueFull },
       ]
       if (input.number === 3) return [
-        { type: "AXIS_RSX", value: valueRange },
+        { type: "AXIS_RSX", value: valueAxis },
       ]
       if (input.number === 4) return [
-        { type: "AXIS_RSY", value: valueRange },
+        { type: "AXIS_RSY", value: valueAxis },
       ]
       if (input.number === 5) return [
         { type: "AXIS_RT", value: valueFull },
       ]
-      if (input.number === 6) return [
-        { type: "BUTTON_DL", value: valueRange },
-      ]
-      if (input.number === 7) return [
-        { type: "BUTTON_DU", value: valueRange },
-      ]
+      if (input.number === 6)
+        return value > 0 ? [
+          { type: "BUTTON_DL", value: 0 },
+          { type: "BUTTON_DR", value: valueAxisAbs },
+        ] : [
+          { type: "BUTTON_DL", value: valueAxisAbs },
+          { type: "BUTTON_DR", value: 0 },
+        ]
+      if (input.number === 7)
+        return value > 0 ? [
+          { type: "BUTTON_DU", value: 0 },
+          { type: "BUTTON_DD", value: valueAxisAbs },
+        ] : [
+          { type: "BUTTON_DU", value: valueAxisAbs },
+          { type: "BUTTON_DD", value: 0 },
+        ]
     }
     return []
   },
@@ -115,18 +126,19 @@ export const JOYSTICK_MAPPINGS: Record<JoystickMapping, JoystickMap> = {
       const valueFull = Math.round((input.value + MAX_16_BIT_INT_VALUE) / (MAX_16_BIT_INT_VALUE * 2 + 1) * MAX_INT_RADIO_VALUE)
       const valuePos = value < 0 ? Math.abs(value) : 0
       const valueNeg = value > 0 ? Math.abs(value) : 0
-      const valueRange = valuePos - valueNeg
+      const valueAxis = valuePos - valueNeg
+      const valueAxisAbs = Math.abs(valueAxis)
       if (input.number === 0) return [
-        { type: "AXIS_LSX", value: valueRange },
+        { type: "AXIS_LSX", value: valueAxis },
       ]
       if (input.number === 1) return [
-        { type: "AXIS_LSY", value: valueRange },
+        { type: "AXIS_LSY", value: valueAxis },
       ]
       if (input.number === 2) return [
-        { type: "AXIS_RSX", value: valueRange },
+        { type: "AXIS_RSX", value: valueAxis },
       ]
       if (input.number === 3) return [
-        { type: "AXIS_RSY", value: valueRange },
+        { type: "AXIS_RSY", value: valueAxis },
       ]
       if (input.number === 4) return [
         { type: "AXIS_RT", value: valueFull },
@@ -134,12 +146,22 @@ export const JOYSTICK_MAPPINGS: Record<JoystickMapping, JoystickMap> = {
       if (input.number === 5) return [
         { type: "AXIS_LT", value: valueFull },
       ]
-      if (input.number === 6) return [
-        { type: "BUTTON_DL", value: valueRange },
-      ]
-      if (input.number === 7) return [
-        { type: "BUTTON_DU", value: valueRange },
-      ]
+      if (input.number === 6)
+        return value > 0 ? [
+          { type: "BUTTON_DL", value: 0 },
+          { type: "BUTTON_DR", value: valueAxisAbs },
+        ] : [
+          { type: "BUTTON_DL", value: valueAxisAbs },
+          { type: "BUTTON_DR", value: 0 },
+        ]
+      if (input.number === 7)
+        return value > 0 ? [
+          { type: "BUTTON_DU", value: 0 },
+          { type: "BUTTON_DD", value: valueAxisAbs },
+        ] : [
+          { type: "BUTTON_DU", value: valueAxisAbs },
+          { type: "BUTTON_DD", value: 0 },
+        ]
     }
     return []
   },

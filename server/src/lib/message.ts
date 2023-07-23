@@ -16,7 +16,7 @@ export const createInputMessage = (controllerIndex: number, js: LinuxJoystick) =
   for (const [type, len] of RADIO_MESSAGE_BUFFER) {
     output.push(numberToByte(Math.max(0, js.values[type])))
     if (len === 2)
-      output.push(numberToByte(Math.min(0, js.values[type])))
+      output.push(numberToByte(Math.abs(Math.min(0, js.values[type]))))
   }
   return output.join("")
 }

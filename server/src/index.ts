@@ -20,7 +20,7 @@ function updateLoop() {
   const messages: string[] = []
   for (let i = 0; i < joystickManagers.length; i++) {
     const jm = joystickManagers[i]
-    if (typeof jm.js !== "undefined") {
+    if (typeof jm.js !== "undefined" && jm.ready) {
       messages.push(createInputMessage(i, jm.js))
       jm.js.clearTrackedChanges()
     }
