@@ -1,7 +1,3 @@
-
-// import { SerialPort, ReadlineParser } from "serialport"
-// import { SERIAL_BAUDRATE } from "./constants"
-
 import { SerialPort } from "serialport";
 import { MAX_CONTROLLERS, POLL_INTERVAL, SERIAL_BAUDRATE } from "./constants";
 import { JoystickManager } from "./lib/joystick/manager";

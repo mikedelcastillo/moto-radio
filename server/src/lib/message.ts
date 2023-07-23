@@ -1,4 +1,4 @@
-import { BYTES, ControllerInput, MAX_INT_RADIO_VALUE, INT_START_BYTE, MAX_CONTROLLERS, RADIO_MESSAGE_BUFFER } from "../constants"
+import { BYTES, MAX_INT_RADIO_VALUE, INT_START_BYTE, MAX_CONTROLLERS, RADIO_MESSAGE_BUFFER } from "../constants"
 import { LinuxJoystick } from "./joystick"
 import { clamp } from "./utils"
 
