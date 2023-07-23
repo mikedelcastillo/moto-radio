@@ -20,7 +20,7 @@ void updateRadioInput(RF24 *radio, ControllerInput *cinput)
   {
     uint8_t serialBuffer[SERIAL_BUFFER_LENGTH];
     radio->read(&serialBuffer, sizeof(serialBuffer));
-    controllerInputFromBuffer(serialBuffer, &cinput);
+    controllerInputFromBuffer(serialBuffer, cinput);
     tTimeout.reset();
   }
   else
