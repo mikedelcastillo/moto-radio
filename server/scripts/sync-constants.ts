@@ -15,10 +15,13 @@ const lines = [
 const run = async () => {
   const defineValues: Array<[string, string]> = [
     ["SERIAL_BAUDRATE", CONSTS.SERIAL_BAUDRATE.toString()],
+    ["SERIAL_BUFFER_LENGTH", (CONSTS.RADIO_MESSAGE_BUFFER_LENGTH + 2).toString()],
     ["MAX_INT_RADIO_VALUE", CONSTS.MAX_INT_RADIO_VALUE.toString()],
     ["MAX_CONTROLLERS", CONSTS.MAX_CONTROLLERS.toString()],
     ["MAX_RADIO_ADDRESSES", CONSTS.MAX_RADIO_ADDRESSES.toString()],
     ["RADIO_MESSAGE_BUFFER_LENGTH", CONSTS.RADIO_MESSAGE_BUFFER_LENGTH.toString()],
+    ["POLL_INTERVAL", CONSTS.POLL_INTERVAL.toString()],
+    ["TIMEOUT_INTERVAL", CONSTS.TIMEOUT_INTERVAL.toString()],
   ]
 
   for (const key in CONSTS.BYTES) {
@@ -73,6 +76,26 @@ const run = async () => {
       `  cinput->${type} = 0;`),
     `}`,
   ])
+
+  // Controller from buffer
+  lines.push("")
+  lines.push(`void controllerInputFromBuffer(uint8_t buffer[SERIAL_BUFFER_LENGTH], ControllerInput *cinput){`)
+  let serialBufferIndex = 2 // 0 = command byte, 1 = controller index
+  for (const [type, len] of CONSTS.RADIO_MESSAGE_BUFFER) {
+    if (len === 1)
+      lines.push(`  cinput->${type} = parseIntFromChar(buffer[${serialBufferIndex}]);`)
+    else
+      lines.push(`  cinput->${type} = parseIntFromChar(buffer[${serialBufferIndex}]) - parseFloatFromChar(buffer[${serialBufferIndex + 1}]);`)
+    serialBufferIndex += len
+  }
+  lines.push("}")
+  // lines.push(...[
+  //   ``,
+  //   ...CONSTS.RADIO_MESSAGE_BUFFER.map(([type, len], index) =>
+  //     len === 1 ? `  cinput->${type} = buffer[${index + 1}];` : ``
+  //   ),
+  //   `}`,
+  // ])
 
   // Radio addresses
   lines.push("")

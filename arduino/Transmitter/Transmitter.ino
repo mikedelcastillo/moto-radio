@@ -4,8 +4,6 @@
 #include "lib/radio.h"
 #include "lib/timing.h"
 
-#define BUFFER_LENGTH 5
-
 #define RF24_CE_PIN 8
 #define RF24_CSN_PIN 9
 
@@ -19,7 +17,7 @@ typedef struct
 
 Controller CONTROLLERS[MAX_CONTROLLERS] = {{0}, {1}, {2}, {3}};
 
-uint8_t serialBuffer[BUFFER_LENGTH];
+uint8_t serialBuffer[SERIAL_BUFFER_LENGTH];
 uint8_t serialBufferLength = 0;
 
 Timing tLcd(TIMING_MILLIS, 250);
@@ -55,10 +53,7 @@ void updateSerial()
     if (serialBufferLength == 0)
     {
       // Check if starting byte is valid
-      if (value == CONTROLLER_INPUT_BYTE)
-      {
-      }
-      else
+      if (value != CONTROLLER_INPUT_BYTE)
       {
         // Do not allow invalid start byte to enter buffer
         return;
@@ -67,7 +62,7 @@ void updateSerial()
     serialBuffer[serialBufferLength] = value;
     serialBufferLength++;
     // Overflow if buffer is not used
-    if (serialBufferLength > BUFFER_LENGTH)
+    if (serialBufferLength > SERIAL_BUFFER_LENGTH)
     {
       serialBufferLength = 0;
     }
@@ -76,21 +71,19 @@ void updateSerial()
 
 void processMessage()
 {
-  if (serialBuffer[0] == CONTROLLER_INPUT_BYTE && serialBufferLength == 5)
+  if (serialBuffer[0] == CONTROLLER_INPUT_BYTE && serialBufferLength == SERIAL_BUFFER_LENGTH)
   {
     serialBufferLength = 0;
     uint8_t index = parseIntFromChar(serialBuffer[1]);
-    uint8_t input = serialBuffer[2];
-    uint8_t valuePos = serialBuffer[3];
-    uint8_t valueNeg = serialBuffer[4];
 
     bool safeIndex = isSafeControllerIndex(index);
     if (safeIndex)
     {
+      ControllerInput cinput;
+      controllerInputFromBuffer(serialBuffer, &cinput);
       // Check if center button is pressed
-      bool isButtonCenter = getControllerInputType(input) == CI_BUTTON_CENTER;
-      bool isPressing = parseIntFromChar(valuePos) == MAX_INT_RADIO_VALUE;
-      if (isButtonCenter && isPressing)
+      bool isPressingCenter = cinput.BUTTON_CENTER == MAX_INT_RADIO_VALUE;
+      if (isPressingCenter)
       {
         // Update controller channel
         int nextIndex = CONTROLLERS[index].addressIndex + 1;
@@ -102,12 +95,7 @@ void processMessage()
         Controller controller = CONTROLLERS[index];
         radio.stopListening();
         radio.openWritingPipe(RADIO_ADDRESSES[controller.addressIndex]);
-        RadioData data;
-        data.type = CONTROLLER_INPUT_BYTE;
-        data.input = input;
-        data.valuePos = valuePos;
-        data.valueNeg = valueNeg;
-        radio.writeFast(&data, sizeof(RadioData));
+        radio.writeFast(&cinput, sizeof(cinput));
       }
     }
   }

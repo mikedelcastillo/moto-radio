@@ -1,5 +1,7 @@
 export const SERIAL_BAUDRATE = 115200
 export const INT_START_BYTE = 0
+export const POLL_INTERVAL = 25
+export const TIMEOUT_INTERVAL = 100
 
 export const RADIO_ADDRESSES = [
   "twig", "soy", "boni", "branch", "pizza", "drafj",
@@ -64,6 +66,7 @@ export const RADIO_MESSAGE_BUFFER = [
   ["BUTTON_DR", 1],
   ["BUTTON_LS", 1],
   ["BUTTON_RS", 1],
+  ["BUTTON_CENTER", 1],
   ["AXIS_LSX", 2],
   ["AXIS_LSY", 2],
   ["AXIS_RSX", 2],

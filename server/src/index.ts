@@ -3,7 +3,7 @@
 // import { SERIAL_BAUDRATE } from "./constants"
 
 import { SerialPort } from "serialport";
-import { MAX_CONTROLLERS, SERIAL_BAUDRATE } from "./constants";
+import { MAX_CONTROLLERS, POLL_INTERVAL, SERIAL_BAUDRATE } from "./constants";
 import { JoystickManager } from "./lib/joystick/manager";
 import { createInputMessage } from "./lib/message";
 
@@ -58,5 +58,5 @@ board.open((error) => {
 
   setInterval(() => {
     updateLoop()
-  }, 1000 / 20)
+  }, POLL_INTERVAL)
 })

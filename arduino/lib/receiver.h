@@ -5,7 +5,7 @@
 #include "radio.h"
 #include "timing.h"
 
-Timing tTimeout(TIMING_MILLIS, 100);
+Timing tTimeout(TIMING_MILLIS, TIMEOUT_INTERVAL);
 
 void setupRadioReceiver(RF24 *radio, uint8_t *address)
 {
