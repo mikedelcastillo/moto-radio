@@ -1,4 +1,5 @@
-import { BYTES, ControllerInput, MAX_INT_RADIO_VALUE, INT_START_BYTE, MAX_CONTROLLERS } from "../constants"
+import { BYTES, ControllerInput, MAX_INT_RADIO_VALUE, INT_START_BYTE, MAX_CONTROLLERS, RADIO_MESSAGE_BUFFER } from "../constants"
+import { LinuxJoystick } from "./joystick"
 import { clamp } from "./utils"
 
 export const numberToByte = (n: number) => {
@@ -6,13 +7,16 @@ export const numberToByte = (n: number) => {
   return String.fromCharCode(INT_START_BYTE + n)
 }
 
-export const createInputMessage = (controllerIndex: number, type: ControllerInput, valuePos: number, valueNeg: number) => {
+export const createInputMessage = (controllerIndex: number, js: LinuxJoystick) => {
   controllerIndex = clamp(controllerIndex, MAX_CONTROLLERS - 1)
-  return [
+  const output: string[] = [
     BYTES.CONTROLLER_INPUT,
     numberToByte(controllerIndex),
-    BYTES[type],
-    numberToByte(valuePos),
-    numberToByte(valueNeg),
-  ].join("")
+  ]
+  for (const [type, len] of RADIO_MESSAGE_BUFFER) {
+    output.push(numberToByte(Math.max(0, js.values[type])))
+    if (len === 2)
+      output.push(numberToByte(Math.min(0, js.values[type])))
+  }
+  return output.join("")
 }

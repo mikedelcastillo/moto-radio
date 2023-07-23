@@ -12,8 +12,7 @@ export type JoystickInput = {
 
 export type JoystickMappedInput = {
   type: ControllerInput,
-  valuePos: number,
-  valueNeg: number,
+  value: number,
 }
 
 export enum JoystickMapping {
@@ -28,8 +27,7 @@ export const JOYSTICK_MAPPINGS: Record<JoystickMapping, JoystickMap> = {
     if (input.type === "button") {
       const output: JoystickMappedInput = {
         type: "IGNORE",
-        valuePos: input.value === 0 ? 0 : MAX_INT_RADIO_VALUE,
-        valueNeg: 0,
+        value: input.value === 0 ? 0 : MAX_INT_RADIO_VALUE,
       }
       const order: ControllerInput[] = [
         "BUTTON_A",
@@ -54,29 +52,30 @@ export const JOYSTICK_MAPPINGS: Record<JoystickMapping, JoystickMap> = {
       const valueFull = Math.round((input.value + MAX_16_BIT_INT_VALUE) / (MAX_16_BIT_INT_VALUE * 2 + 1) * MAX_INT_RADIO_VALUE)
       const valuePos = value < 0 ? Math.abs(value) : 0
       const valueNeg = value > 0 ? Math.abs(value) : 0
+      const valueRange = valuePos - valueNeg
       if (input.number === 0) return [
-        { type: "AXIS_LSX", valuePos, valueNeg },
+        { type: "AXIS_LSX", value: valueRange },
       ]
       if (input.number === 1) return [
-        { type: "AXIS_LSY", valuePos, valueNeg },
+        { type: "AXIS_LSY", value: valueRange },
       ]
       if (input.number === 2) return [
-        { type: "AXIS_LT", valuePos: valueFull, valueNeg: 0 },
+        { type: "AXIS_LT", value: valueFull },
       ]
       if (input.number === 3) return [
-        { type: "AXIS_RSX", valuePos, valueNeg },
+        { type: "AXIS_RSX", value: valueRange },
       ]
       if (input.number === 4) return [
-        { type: "AXIS_RSY", valuePos, valueNeg },
+        { type: "AXIS_RSY", value: valueRange },
       ]
       if (input.number === 5) return [
-        { type: "AXIS_RT", valuePos: valueFull, valueNeg: 0 },
+        { type: "AXIS_RT", value: valueFull },
       ]
       if (input.number === 6) return [
-        { type: "BUTTON_DL", valuePos, valueNeg },
+        { type: "BUTTON_DL", value: valueRange },
       ]
       if (input.number === 7) return [
-        { type: "BUTTON_DU", valuePos, valueNeg },
+        { type: "BUTTON_DU", value: valueRange },
       ]
     }
     return []
@@ -85,8 +84,7 @@ export const JOYSTICK_MAPPINGS: Record<JoystickMapping, JoystickMap> = {
     if (input.type === "button") {
       const output: JoystickMappedInput = {
         type: "IGNORE",
-        valuePos: input.value === 0 ? 0 : MAX_INT_RADIO_VALUE,
-        valueNeg: 0,
+        value: input.value === 0 ? 0 : MAX_INT_RADIO_VALUE,
       }
       const order: ControllerInput[] = [
         "BUTTON_A",
@@ -117,29 +115,30 @@ export const JOYSTICK_MAPPINGS: Record<JoystickMapping, JoystickMap> = {
       const valueFull = Math.round((input.value + MAX_16_BIT_INT_VALUE) / (MAX_16_BIT_INT_VALUE * 2 + 1) * MAX_INT_RADIO_VALUE)
       const valuePos = value < 0 ? Math.abs(value) : 0
       const valueNeg = value > 0 ? Math.abs(value) : 0
+      const valueRange = valuePos - valueNeg
       if (input.number === 0) return [
-        { type: "AXIS_LSX", valuePos, valueNeg },
+        { type: "AXIS_LSX", value: valueRange },
       ]
       if (input.number === 1) return [
-        { type: "AXIS_LSY", valuePos, valueNeg },
+        { type: "AXIS_LSY", value: valueRange },
       ]
       if (input.number === 2) return [
-        { type: "AXIS_RSX", valuePos, valueNeg },
+        { type: "AXIS_RSX", value: valueRange },
       ]
       if (input.number === 3) return [
-        { type: "AXIS_RSY", valuePos, valueNeg },
+        { type: "AXIS_RSY", value: valueRange },
       ]
       if (input.number === 4) return [
-        { type: "AXIS_RT", valuePos: valueFull, valueNeg: 0 },
+        { type: "AXIS_RT", value: valueFull },
       ]
       if (input.number === 5) return [
-        { type: "AXIS_LT", valuePos: valueFull, valueNeg: 0 },
+        { type: "AXIS_LT", value: valueFull },
       ]
       if (input.number === 6) return [
-        { type: "BUTTON_DL", valuePos, valueNeg },
+        { type: "BUTTON_DL", value: valueRange },
       ]
       if (input.number === 7) return [
-        { type: "BUTTON_DU", valuePos, valueNeg },
+        { type: "BUTTON_DU", value: valueRange },
       ]
     }
     return []

@@ -6,6 +6,7 @@ export const TIMEOUT_INTERVAL = 100
 export const RADIO_ADDRESSES = [
   "twig", "soy", "boni", "branch", "pizza", "drafj",
   "draft", "blu", "percy", "pasta", "rust", "jinx", "bambi",
+  "fern", "matcha",
 ]
 
 export const MAX_RADIO_ADDRESSES = RADIO_ADDRESSES.length
