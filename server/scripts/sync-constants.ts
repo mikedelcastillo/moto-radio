@@ -89,13 +89,6 @@ const run = async () => {
     serialBufferIndex += len
   }
   lines.push("}")
-  // lines.push(...[
-  //   ``,
-  //   ...CONSTS.RADIO_MESSAGE_BUFFER.map(([type, len], index) =>
-  //     len === 1 ? `  cinput->${type} = buffer[${index + 1}];` : ``
-  //   ),
-  //   `}`,
-  // ])
 
   // Radio addresses
   lines.push("")
