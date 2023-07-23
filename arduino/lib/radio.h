@@ -1,14 +1,11 @@
+#ifndef MR_RADIO
+#define MR_RADIO
+
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
 
-typedef struct
-{
-  uint8_t type;
-  uint8_t input;
-  uint8_t valuePos;
-  uint8_t valueNeg;
-} RadioData;
+#include "constants.h"
 
 void setupRadio(RF24 *radio)
 {
@@ -17,5 +14,7 @@ void setupRadio(RF24 *radio)
   radio->setAutoAck(false);
   radio->setDataRate(RF24_250KBPS);
   radio->setPALevel(RF24_PA_MIN);
-  radio->setPayloadSize(sizeof(RadioData));
+  radio->setPayloadSize(sizeof(ControllerInput));
 }
+
+#endif

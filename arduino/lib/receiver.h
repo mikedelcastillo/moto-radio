@@ -1,5 +1,11 @@
+#ifndef MR_RECEIVER
+#define MR_RECEIVER
+
 #include "constants.h"
 #include "radio.h"
+#include "timing.h"
+
+Timing tTimeout(TIMING_MILLIS, 100);
 
 void setupRadioReceiver(RF24 *radio, uint8_t *address)
 {
@@ -12,11 +18,16 @@ void updateRadioInput(RF24 *radio, ControllerInput *cinput)
 {
   if (radio->available())
   {
-    RadioData data;
-    radio->read(&data, sizeof(RadioData));
-    ControllerValue value;
-    value.pos = parseIntFromChar(data.valuePos);
-    value.neg = parseIntFromChar(data.valueNeg);
-    setControllerInputValue(cinput, data.input, value);
+    radio->read(cinput, sizeof(ControllerInput));
+    tTimeout.reset();
+  }
+  else
+  {
+    if (tTimeout.poll())
+    {
+      resetControllerInput(cinput);
+    }
   }
 }
+
+#endif

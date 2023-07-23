@@ -57,12 +57,12 @@ void loop()
   if (tUpdate.poll())
   {
     // Update steering
-    int steerSum = CONTROLLER_INPUT.AXIS_LSX.pos - CONTROLLER_INPUT.AXIS_LSX.neg;
-    int steerValue = map(steerSum, -MAX_INT_RADIO_VALUE, MAX_INT_RADIO_VALUE, STEER_LEFT, STEER_RIGHT);
+    int steerSum = CONTROLLER_INPUT.AXIS_LSX;
+    int steerValue = map(CONTROLLER_INPUT.AXIS_LSX, -MAX_INT_RADIO_VALUE, MAX_INT_RADIO_VALUE, STEER_LEFT, STEER_RIGHT);
     steerServo.write(steerValue);
 
     // Update throttle
-    int throttleSum = CONTROLLER_INPUT.AXIS_RT.pos - CONTROLLER_INPUT.AXIS_LT.pos;
+    int throttleSum = CONTROLLER_INPUT.AXIS_RT - CONTROLLER_INPUT.AXIS_LT;
     if (abs(throttleSum) > THROTTLE_MIN)
     {
       int power = intToFloat(abs(throttleSum)) * MAX_PWM_VALUE;
