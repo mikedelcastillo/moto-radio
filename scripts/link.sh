@@ -1,5 +1,6 @@
 shopt -s extglob
 
+rm -rf ./arduino/*/lib
 for d in ./arduino/!(lib)/   
 do    
     dir=$(basename "$d")
