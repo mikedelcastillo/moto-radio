@@ -63,7 +63,7 @@ const run = async () => {
   // Controller input struct
   lines.push("")
   lines.push(...[
-    `typedef __attribute__ ((packed)) struct {`,
+    `typedef __attribute__((packed, aligned(1))) struct {`,
     ...CONSTS.RADIO_MESSAGE_BUFFER.map(([type, len]) => `  ${len === 1 ? "uint8_t" : "int16_t"} ${type};`),
     `} ControllerInput;`,
   ])
