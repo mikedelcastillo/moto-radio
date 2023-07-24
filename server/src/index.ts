@@ -17,7 +17,7 @@ for (let i = 0; i < MAX_CONTROLLERS; i++) {
 }
 
 function updateLoop() {
-  const messages: string[] = []
+  const messages: Buffer[] = []
   for (let i = 0; i < joystickManagers.length; i++) {
     const jm = joystickManagers[i]
     if (typeof jm.js !== "undefined" && jm.ready) {
@@ -26,12 +26,10 @@ function updateLoop() {
     }
   }
 
-  if (messages.length > 0) {
-    const message = messages.join("")
-    const debug = message.split("").map(c => "0" + c.charCodeAt(0).toString(16))
-      .map(s => s.substring(s.length - 2, s.length)).join(" ")
-    console.log(`[SERIAL]: Writing ${debug}`)
-    board.write(message)
+  for (const buffer of messages) {
+    if (typeof process.env.DEBUG_SERIAL_WRITE === "string")
+      console.log(`[SERIAL]: Writing`, buffer)
+    board.write(buffer)
   }
 }
 

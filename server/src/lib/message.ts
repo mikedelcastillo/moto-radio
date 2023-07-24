@@ -9,14 +9,14 @@ export const numberToByte = (n: number) => {
 
 export const createInputMessage = (controllerIndex: number, js: LinuxJoystick) => {
   controllerIndex = clamp(controllerIndex, MAX_CONTROLLERS - 1)
-  const output: string[] = [
-    BYTES.CONTROLLER_INPUT,
-    numberToByte(controllerIndex),
+  const output: number[] = [
+    BYTES.CONTROLLER_INPUT.charCodeAt(0),
+    numberToByte(controllerIndex).charCodeAt(0),
   ]
   for (const [type, len] of RADIO_MESSAGE_BUFFER) {
-    output.push(numberToByte(Math.max(0, js.values[type])))
+    output.push(numberToByte(Math.max(0, js.values[type])).charCodeAt(0))
     if (len === 2)
-      output.push(numberToByte(Math.abs(Math.min(0, js.values[type]))))
+      output.push(numberToByte(Math.abs(Math.min(0, js.values[type]))).charCodeAt(0))
   }
-  return output.join("")
+  return Buffer.from(output)
 }
