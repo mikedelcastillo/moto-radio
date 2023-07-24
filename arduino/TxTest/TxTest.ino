@@ -20,13 +20,18 @@ void loop()
 {
   TestMessage message;
   message.a = count + 0;
-  message.b = count + 1;
-  message.c = count + 2;
+  message.b = count - 100;
+  message.c = count + 20;
   radio.stopListening();
   radio.openWritingPipe(RADIO_ADDRESS);
   radio.writeFast(&message, sizeof(TestMessage));
   Serial.print("Sent: ");
-  Serial.println(count);
+  Serial.print(message.a);
+  Serial.print(" ");
+  Serial.print(message.b);
+  Serial.print(" ");
+  Serial.print(message.c);
+  Serial.print("\n");
   count++;
-  delay(1000);
+  delay(250);
 }

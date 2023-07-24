@@ -7,7 +7,7 @@ typedef struct
 {
   uint8_t a;
   int16_t b;
-  byte c;
+  int c;
 } TestMessage;
 
 void debugTest()

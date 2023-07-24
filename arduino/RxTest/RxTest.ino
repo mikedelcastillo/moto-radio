@@ -21,9 +21,9 @@ void loop()
     TestMessage message;
     radio.read(&message, sizeof(TestMessage));
     Serial.print(message.a);
-    Serial.print("\t");
+    Serial.print(" ");
     Serial.print(message.b);
-    Serial.print("\t");
+    Serial.print(" ");
     Serial.print(message.c);
     Serial.print("\n");
   }
