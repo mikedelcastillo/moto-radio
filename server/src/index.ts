@@ -42,6 +42,14 @@ board.open((error) => {
   console.log("Connected to board!")
 
   board.on("data", (data) => console.log(`[SERIAL]: ${data}`))
+  board.on("close", () => {
+    console.log("Board closed")
+    process.exit()
+  })
+  board.on("error", () => {
+    console.log("Board errored")
+    process.exit()
+  })
 
   setInterval(() => {
     updateLoop()
