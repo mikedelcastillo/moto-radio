@@ -4,8 +4,6 @@
 #include "lib/radio.h"
 #include "lib/timing.h"
 
-#define BUFFER_LENGTH 5
-
 #define RF24_CE_PIN 8
 #define RF24_CSN_PIN 9
 
@@ -18,8 +16,11 @@ typedef struct
 } Controller;
 
 Controller CONTROLLERS[MAX_CONTROLLERS] = {{0}, {1}, {2}, {3}};
+ControllerInput CONTROLLER_INPUT;
 
-uint8_t serialBuffer[BUFFER_LENGTH];
+bool wasPressingSwitchChannels = false;
+
+uint8_t serialBuffer[SERIAL_BUFFER_LENGTH];
 uint8_t serialBufferLength = 0;
 
 Timing tLcd(TIMING_MILLIS, 250);
@@ -55,10 +56,7 @@ void updateSerial()
     if (serialBufferLength == 0)
     {
       // Check if starting byte is valid
-      if (value == CONTROLLER_INPUT_BYTE)
-      {
-      }
-      else
+      if (value != CONTROLLER_INPUT_BYTE)
       {
         // Do not allow invalid start byte to enter buffer
         return;
@@ -67,7 +65,7 @@ void updateSerial()
     serialBuffer[serialBufferLength] = value;
     serialBufferLength++;
     // Overflow if buffer is not used
-    if (serialBufferLength > BUFFER_LENGTH)
+    if (serialBufferLength > SERIAL_BUFFER_LENGTH)
     {
       serialBufferLength = 0;
     }
@@ -76,39 +74,30 @@ void updateSerial()
 
 void processMessage()
 {
-  if (serialBuffer[0] == CONTROLLER_INPUT_BYTE && serialBufferLength == 5)
+  if (serialBuffer[0] == CONTROLLER_INPUT_BYTE && serialBufferLength == SERIAL_BUFFER_LENGTH)
   {
     serialBufferLength = 0;
     uint8_t index = parseIntFromChar(serialBuffer[1]);
-    uint8_t input = serialBuffer[2];
-    uint8_t valuePos = serialBuffer[3];
-    uint8_t valueNeg = serialBuffer[4];
 
     bool safeIndex = isSafeControllerIndex(index);
     if (safeIndex)
     {
+      controllerInputFromBuffer(serialBuffer, &CONTROLLER_INPUT);
       // Check if center button is pressed
-      bool isButtonCenter = getControllerInputType(input) == CI_BUTTON_CENTER;
-      bool isPressing = parseIntFromChar(valuePos) == MAX_INT_RADIO_VALUE;
-      if (isButtonCenter && isPressing)
+      bool isPressingSwitchChannels = CONTROLLER_INPUT.BUTTON_CENTER == MAX_INT_RADIO_VALUE && CONTROLLER_INPUT.BUTTON_SELECT == MAX_INT_RADIO_VALUE;
+      if (isPressingSwitchChannels && !wasPressingSwitchChannels)
       {
         // Update controller channel
         int nextIndex = CONTROLLERS[index].addressIndex + 1;
         CONTROLLERS[index].addressIndex = nextIndex >= MAX_RADIO_ADDRESSES ? 0 : nextIndex;
       }
-      else
-      {
-        // Transmit data
-        Controller controller = CONTROLLERS[index];
-        radio.stopListening();
-        radio.openWritingPipe(RADIO_ADDRESSES[controller.addressIndex]);
-        RadioData data;
-        data.type = CONTROLLER_INPUT_BYTE;
-        data.input = input;
-        data.valuePos = valuePos;
-        data.valueNeg = valueNeg;
-        radio.writeFast(&data, sizeof(RadioData));
-      }
+      wasPressingSwitchChannels = isPressingSwitchChannels;
+
+      // Transmit data
+      Controller controller = CONTROLLERS[index];
+      radio.stopListening();
+      radio.openWritingPipe(RADIO_ADDRESSES[controller.addressIndex]);
+      radio.writeFast(&CONTROLLER_INPUT, sizeof(ControllerInput));
     }
   }
 }
@@ -117,6 +106,7 @@ void updateLcd()
 {
   if (tLcd.poll())
   {
+    lcd.clear();
     for (int i = 0; i < min(4, MAX_CONTROLLERS); i++)
     {
       lcd.setCursor(0, i);

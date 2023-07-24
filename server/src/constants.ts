@@ -1,9 +1,12 @@
 export const SERIAL_BAUDRATE = 115200
 export const INT_START_BYTE = 0
+export const POLL_INTERVAL = 25
+export const TIMEOUT_INTERVAL = 100
 
 export const RADIO_ADDRESSES = [
   "twig", "soy", "boni", "branch", "pizza", "drafj",
   "draft", "blu", "percy", "pasta", "rust", "jinx", "bambi",
+  "fern", "matcha",
 ]
 
 export const MAX_RADIO_ADDRESSES = RADIO_ADDRESSES.length
@@ -42,17 +45,39 @@ export const CONTROLLER_INPUT_ENUM = [
   "IGNORE",
 ] as const
 
-export const BYTE_KEYS = [...MESSAGE_BYTE_KEYS, ...CONTROLLER_INPUT_ENUM] as const
+export const BYTE_KEYS = [...MESSAGE_BYTE_KEYS] as const
 
 export type ControllerInput = typeof CONTROLLER_INPUT_ENUM[number]
 export type ByteKeys = typeof BYTE_KEYS[number]
 
+export const RADIO_MESSAGE_BUFFER = [
+  ["BUTTON_A", 1],
+  ["BUTTON_B", 1],
+  ["BUTTON_X", 1],
+  ["BUTTON_Y", 1],
+  ["BUTTON_START", 1],
+  ["BUTTON_SELECT", 1],
+  ["AXIS_LT", 1],
+  ["AXIS_RT", 1],
+  ["BUTTON_LB", 1],
+  ["BUTTON_RB", 1],
+  ["BUTTON_DU", 1],
+  ["BUTTON_DD", 1],
+  ["BUTTON_DL", 1],
+  ["BUTTON_DR", 1],
+  ["BUTTON_LS", 1],
+  ["BUTTON_RS", 1],
+  ["BUTTON_CENTER", 1],
+  ["AXIS_LSX", 2],
+  ["AXIS_LSY", 2],
+  ["AXIS_RSX", 2],
+  ["AXIS_RSY", 2],
+] as const satisfies readonly (readonly [ControllerInput, 1 | 2])[]
+
+export const RADIO_MESSAGE_BUFFER_LENGTH = RADIO_MESSAGE_BUFFER
+  .reduce((sum, item) => sum += item[1], 0)
+
 export const BYTES = {
   CONTROLLER_INPUT: "i",
   CONTROLLER_CLEAR: "c",
-} as Record<ByteKeys, string>
-
-for (let i = 0; i < CONTROLLER_INPUT_ENUM.length; i++) {
-  const key = CONTROLLER_INPUT_ENUM[i] as unknown as ByteKeys
-  BYTES[key] = String.fromCharCode(INT_START_BYTE + i)
-}
+} as const satisfies Record<ByteKeys, string>

@@ -18,7 +18,7 @@
 
 #define MAX_STEER_ANGLE 70
 #define STEER_MIDDLE 103
-#define STEER_SIGN -1
+#define STEER_SIGN 1
 #define STEER_LEFT (STEER_MIDDLE - MAX_STEER_ANGLE / 2 * STEER_SIGN)
 #define STEER_RIGHT (STEER_MIDDLE + MAX_STEER_ANGLE / 2 * STEER_SIGN)
 
@@ -35,6 +35,8 @@ Timing tUpdate(TIMING_MILLIS, 15);
 
 void setup()
 {
+  Serial.begin(SERIAL_BAUDRATE);
+
   setupRadioReceiver(&radio, RADIO_ADDRESS);
   steerServo.attach(SERVO_STEER_PIN);
   pinMode(MOTOR_RPWM_PIN, OUTPUT);
@@ -57,12 +59,13 @@ void loop()
   if (tUpdate.poll())
   {
     // Update steering
-    int steerSum = CONTROLLER_INPUT.AXIS_LSX.pos - CONTROLLER_INPUT.AXIS_LSX.neg;
-    int steerValue = map(steerSum, -MAX_INT_RADIO_VALUE, MAX_INT_RADIO_VALUE, STEER_LEFT, STEER_RIGHT);
+    float steerSum = (float)CONTROLLER_INPUT.AXIS_LSX / (float)MAX_INT_RADIO_VALUE;
+    int steerAmount = steerSum * MAX_STEER_ANGLE / 2 * STEER_SIGN;
+    int steerValue = STEER_MIDDLE + steerAmount;
     steerServo.write(steerValue);
 
     // Update throttle
-    int throttleSum = CONTROLLER_INPUT.AXIS_RT.pos - CONTROLLER_INPUT.AXIS_LT.pos;
+    int throttleSum = CONTROLLER_INPUT.AXIS_RT - CONTROLLER_INPUT.AXIS_LT;
     if (abs(throttleSum) > THROTTLE_MIN)
     {
       int power = intToFloat(abs(throttleSum)) * MAX_PWM_VALUE;

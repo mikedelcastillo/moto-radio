@@ -1,9 +1,5 @@
-
-// import { SerialPort, ReadlineParser } from "serialport"
-// import { SERIAL_BAUDRATE } from "./constants"
-
 import { SerialPort } from "serialport";
-import { MAX_CONTROLLERS, SERIAL_BAUDRATE } from "./constants";
+import { MAX_CONTROLLERS, POLL_INTERVAL, SERIAL_BAUDRATE } from "./constants";
 import { JoystickManager } from "./lib/joystick/manager";
 import { createInputMessage } from "./lib/message";
 
@@ -21,28 +17,19 @@ for (let i = 0; i < MAX_CONTROLLERS; i++) {
 }
 
 function updateLoop() {
-  const messages: string[] = []
+  const messages: Buffer[] = []
   for (let i = 0; i < joystickManagers.length; i++) {
     const jm = joystickManagers[i]
-    if (typeof jm.js === "undefined") continue
-
-    const changes = jm.js.trackedChanges
-    if (changes.length > 0) {
-      for (const change of changes) {
-        const value = jm.js?.values[change] || { pos: 0, neg: 0 }
-        messages.push(createInputMessage(i, change, value.pos, value.neg))
-      }
+    if (typeof jm.js !== "undefined" && jm.ready) {
+      messages.push(createInputMessage(i, jm.js))
+      jm.js.clearTrackedChanges()
     }
-
-    jm.js.clearTrackedChanges()
   }
 
-  if (messages.length > 0) {
-    const message = messages.join("")
-    const debug = message.split("").map(c => "0" + c.charCodeAt(0).toString(16))
-      .map(s => s.substring(s.length - 2, s.length)).join(" ")
-    console.log(`[SERIAL]: Writing ${debug}`)
-    board.write(message)
+  for (const buffer of messages) {
+    if (typeof process.env.DEBUG_SERIAL_WRITE === "string")
+      console.log(`[SERIAL]: Writing`, buffer)
+    board.write(buffer)
   }
 }
 
@@ -58,5 +45,5 @@ board.open((error) => {
 
   setInterval(() => {
     updateLoop()
-  }, 1000 / 20)
+  }, POLL_INTERVAL)
 })
