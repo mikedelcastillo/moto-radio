@@ -35,6 +35,8 @@ Timing tUpdate(TIMING_MILLIS, 15);
 
 void setup()
 {
+  Serial.begin(SERIAL_BAUDRATE);
+
   setupRadioReceiver(&radio, RADIO_ADDRESS);
   steerServo.attach(SERVO_STEER_PIN);
   pinMode(MOTOR_RPWM_PIN, OUTPUT);
