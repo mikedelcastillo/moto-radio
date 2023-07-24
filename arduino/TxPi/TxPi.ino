@@ -16,6 +16,9 @@ typedef struct
 } Controller;
 
 Controller CONTROLLERS[MAX_CONTROLLERS] = {{0}, {1}, {2}, {3}};
+ControllerInput CONTROLLER_INPUT;
+
+bool wasPressingSwitchChannels = false;
 
 uint8_t serialBuffer[SERIAL_BUFFER_LENGTH];
 uint8_t serialBufferLength = 0;
@@ -79,24 +82,22 @@ void processMessage()
     bool safeIndex = isSafeControllerIndex(index);
     if (safeIndex)
     {
-      ControllerInput cinput;
-      controllerInputFromBuffer(serialBuffer, &cinput);
+      controllerInputFromBuffer(serialBuffer, &CONTROLLER_INPUT);
       // Check if center button is pressed
-      bool isPressingCenter = cinput.BUTTON_CENTER == MAX_INT_RADIO_VALUE;
-      if (isPressingCenter)
+      bool isPressingSwitchChannels = CONTROLLER_INPUT.BUTTON_CENTER == MAX_INT_RADIO_VALUE && CONTROLLER_INPUT.BUTTON_SELECT == MAX_INT_RADIO_VALUE;
+      if (isPressingSwitchChannels && !wasPressingSwitchChannels)
       {
         // Update controller channel
         int nextIndex = CONTROLLERS[index].addressIndex + 1;
         CONTROLLERS[index].addressIndex = nextIndex >= MAX_RADIO_ADDRESSES ? 0 : nextIndex;
       }
-      else
-      {
-        // Transmit data
-        Controller controller = CONTROLLERS[index];
-        radio.stopListening();
-        radio.openWritingPipe(RADIO_ADDRESSES[controller.addressIndex]);
-        radio.writeFast(&cinput, sizeof(ControllerInput));
-      }
+      wasPressingSwitchChannels = isPressingSwitchChannels;
+
+      // Transmit data
+      Controller controller = CONTROLLERS[index];
+      radio.stopListening();
+      radio.openWritingPipe(RADIO_ADDRESSES[controller.addressIndex]);
+      radio.writeFast(&CONTROLLER_INPUT, sizeof(ControllerInput));
     }
   }
 }
@@ -105,6 +106,7 @@ void updateLcd()
 {
   if (tLcd.poll())
   {
+    lcd.clear();
     for (int i = 0; i < min(4, MAX_CONTROLLERS); i++)
     {
       lcd.setCursor(0, i);
