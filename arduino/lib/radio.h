@@ -14,7 +14,7 @@ void setupRadio(RF24 *radio)
   radio->setAutoAck(false);
   radio->setDataRate(RF24_250KBPS);
   radio->setPALevel(RF24_PA_MIN);
-  radio->setPayloadSize(sizeof(uint8_t[SERIAL_BUFFER_LENGTH]));
+  radio->setPayloadSize(sizeof(ControllerInput));
 }
 
 #endif

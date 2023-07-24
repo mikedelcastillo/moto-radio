@@ -95,7 +95,7 @@ void processMessage()
         Controller controller = CONTROLLERS[index];
         radio.stopListening();
         radio.openWritingPipe(RADIO_ADDRESSES[controller.addressIndex]);
-        radio.writeFast(&serialBuffer, sizeof(serialBuffer));
+        radio.writeFast(&cinput, sizeof(ControllerInput));
       }
     }
   }
