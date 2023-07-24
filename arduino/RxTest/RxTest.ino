@@ -1,4 +1,4 @@
-#include "lib/radio.h"
+#include "lib/receiver.h"
 #include "lib/test.h"
 
 #define RF24_CE_PIN 7
@@ -10,7 +10,7 @@ uint8_t *RADIO_ADDRESS = RADIO_ADDRESSES[0];
 void setup()
 {
   Serial.begin(SERIAL_BAUDRATE);
-  setupRadio(&radio);
+  setupRadioReceiver(&radio, RADIO_ADDRESS);
   debugTest();
 }
 
