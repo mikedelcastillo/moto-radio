@@ -36,7 +36,7 @@ function updateLoop() {
 board.open((error) => {
   if (error) {
     console.log("Could not connect to board")
-    process.exit()
+    process.exit(1)
   }
 
   console.log("Connected to board!")
@@ -44,11 +44,11 @@ board.open((error) => {
   board.on("data", (data) => console.log(`[SERIAL]: ${data}`))
   board.on("close", () => {
     console.log("Board closed")
-    process.exit()
+    process.exit(1)
   })
   board.on("error", () => {
     console.log("Board errored")
-    process.exit()
+    process.exit(1)
   })
 
   setInterval(() => {
