@@ -18,7 +18,7 @@
 
 #define MAX_STEER_ANGLE 70
 #define STEER_MIDDLE 103
-#define STEER_SIGN -1
+#define STEER_SIGN 1
 #define STEER_LEFT (STEER_MIDDLE - MAX_STEER_ANGLE / 2 * STEER_SIGN)
 #define STEER_RIGHT (STEER_MIDDLE + MAX_STEER_ANGLE / 2 * STEER_SIGN)
 
@@ -57,8 +57,9 @@ void loop()
   if (tUpdate.poll())
   {
     // Update steering
-    int steerSum = CONTROLLER_INPUT.AXIS_LSX;
-    int steerValue = map(CONTROLLER_INPUT.AXIS_LSX, -MAX_INT_RADIO_VALUE, MAX_INT_RADIO_VALUE, STEER_LEFT, STEER_RIGHT);
+    float steerSum = (float)CONTROLLER_INPUT.AXIS_LSX / (float)MAX_INT_RADIO_VALUE;
+    int steerAmount = steerSum * MAX_STEER_ANGLE / 2 * STEER_SIGN;
+    int steerValue = STEER_MIDDLE + steerAmount;
     steerServo.write(steerValue);
 
     // Update throttle

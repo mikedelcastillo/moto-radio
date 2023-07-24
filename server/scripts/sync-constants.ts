@@ -37,10 +37,10 @@ const run = async () => {
   // Int parser
   lines.push("")
   lines.push(...[
-    "int parseIntFromChar(uint8_t value){",
-    `  if(value < ${CONSTS.INT_START_BYTE}) { return 0; }`,
-    `  if(value > ${CONSTS.INT_START_BYTE + CONSTS.MAX_INT_RADIO_VALUE}) { return ${CONSTS.MAX_INT_RADIO_VALUE}; }`,
-    `  return value - ${CONSTS.INT_START_BYTE};`,
+    "int16_t parseIntFromChar(uint8_t value){",
+    `  if((int16_t) value < (int16_t) ${CONSTS.INT_START_BYTE}) { return (int16_t) 0; }`,
+    `  if((int16_t) value > (int16_t) ${CONSTS.INT_START_BYTE + CONSTS.MAX_INT_RADIO_VALUE}) { return (int16_t) ${CONSTS.MAX_INT_RADIO_VALUE}; }`,
+    `  return (int16_t) value - (int16_t) ${CONSTS.INT_START_BYTE};`,
     "}",
   ])
 
