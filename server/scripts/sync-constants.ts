@@ -38,8 +38,8 @@ const run = async () => {
   lines.push("")
   lines.push(...[
     "int16_t parseIntFromChar(uint8_t value){",
-    `  if((int16_t) value < (int16_t) ${CONSTS.INT_START_BYTE}) { return (int16_t) 0; }`,
-    `  if((int16_t) value > (int16_t) ${CONSTS.INT_START_BYTE + CONSTS.MAX_INT_RADIO_VALUE}) { return (int16_t) ${CONSTS.MAX_INT_RADIO_VALUE}; }`,
+    `  if(value < ${CONSTS.INT_START_BYTE}) { return (int16_t) 0; }`,
+    `  if(value > ${CONSTS.INT_START_BYTE + CONSTS.MAX_INT_RADIO_VALUE}) { return (int16_t) ${CONSTS.MAX_INT_RADIO_VALUE}; }`,
     `  return (int16_t) value - (int16_t) ${CONSTS.INT_START_BYTE};`,
     "}",
   ])
@@ -85,7 +85,7 @@ const run = async () => {
     if (len === 1)
       lines.push(`  cinput->${type} = parseIntFromChar(buffer[${serialBufferIndex}]);`)
     else
-      lines.push(`  cinput->${type} = parseIntFromChar(buffer[${serialBufferIndex}]) - parseFloatFromChar(buffer[${serialBufferIndex + 1}]);`)
+      lines.push(`  cinput->${type} = parseIntFromChar(buffer[${serialBufferIndex}]) - parseIntFromChar(buffer[${serialBufferIndex + 1}]);`)
     serialBufferIndex += len
   }
   lines.push("}")
